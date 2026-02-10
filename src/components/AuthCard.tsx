@@ -7,8 +7,14 @@ type Mode = "login" | "register";
 export default function AuthCard() {
     const [mode, setMode] = useState<Mode>("login");
 
+    // Login state
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    // Register state
+    const[registerEmail, setRegisterEmail] = useState("");
+    const[registerPassword, setRegisterPassword] = useState("");
+    const[confirmPassword, setConfirmPassword] = useState("");
 
     const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -16,6 +22,19 @@ export default function AuthCard() {
         console.log("Submitting login:");
         console.log("Email:", email);
         console.log("Password:", password);
+    };
+
+    const handleRegisterSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+
+        if (registerPassword !== confirmPassword) {
+            console.log("Passwords do not match");
+            return;
+        }
+
+        console.log("Submitting register:");
+        console.log("Email:", registerEmail);
+        console.log("Password:", registerPassword);
     };
 
     return (
@@ -52,13 +71,30 @@ export default function AuthCard() {
             )}
 
             {mode === "register" && (
-                <form>
+                <form onSubmit={handleRegisterSubmit}>
                     <p>Register form</p>
 
-                    <input type="email" placeholder="Email" />
-                    <input type="password" placeholder="Password" />
-                    <input type="password" placeholder="Confirm Password" />
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={registerEmail}
+                        onChange={(e) => setRegisterEmail(e.target.value)}
+                    />
 
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={registerPassword}
+                        onChange={(e) => setRegisterPassword(e.target.value)}
+                    />
+
+                    <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                    
                     <button type="submit">Create account</button>
                 </form>
             )}
