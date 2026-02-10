@@ -16,16 +16,16 @@ export default function AuthCard() {
         console.log("Submitting login:");
         console.log("Email:", email);
         console.log("Password:", password);
-    }
+    };
 
     return (
         <div>
             <h1>{mode === "login" ? "Login" : "Register"}</h1>
 
             <div>
-                <button onClick={() => setMode("login")}>Login</button>
-                <button onClick={() => setMode("register")}>Register</button>
-            </div>
+                <button type="button" onClick={() => setMode("login")}>Login</button>
+                <button type="button" onClick={() => setMode("register")}>Register</button>
+            </div> 
 
             {mode === "login" && (
                 <form onSubmit={handleLoginSubmit}>
@@ -46,8 +46,6 @@ export default function AuthCard() {
                     />
 
                     <button type="submit">Enter</button>
-
-                <p>Email in state: {email}</p>
 
                 </form>
 
