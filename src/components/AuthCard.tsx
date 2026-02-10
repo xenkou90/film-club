@@ -11,13 +11,33 @@ export default function AuthCard() {
         <div>
             <h1>{mode === "login" ? "Login" : "Register"}</h1>
 
-            <button type="button" onClick={() => setMode("login")}>
-                Login
-            </button>
+            <div>
+                <button onClick={() => setMode("login")}>Login</button>
+                <button onClick={() => setMode("register")}>Register</button>
+            </div>
 
-            <button type="button" onClick={() => setMode("register")}>
-                Register
-            </button>
+            {mode === "login" && (
+                <form>
+                    <p>Login form</p>
+
+                    <input type="email" placeholder="Email" />
+                    <input type="password" placeholder="Password" />
+
+                    <button type="submit">Enter</button>
+                </form>
+            )}
+
+            {mode === "register" && (
+                <form>
+                    <p>Register form</p>
+
+                    <input type="email" placeholder="Email" />
+                    <input type="password" placeholder="Password" />
+                    <input type="password" placeholder="Confirm Password" />
+
+                    <button type="submit">Create account</button>
+                </form>
+            )}
         </div>
     );
 }
