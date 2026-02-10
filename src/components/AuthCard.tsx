@@ -10,6 +10,14 @@ export default function AuthCard() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+
+        console.log("Submitting login:");
+        console.log("Email:", email);
+        console.log("Password:", password);
+    }
+
     return (
         <div>
             <h1>{mode === "login" ? "Login" : "Register"}</h1>
@@ -20,7 +28,7 @@ export default function AuthCard() {
             </div>
 
             {mode === "login" && (
-                <form>
+                <form onSubmit={handleLoginSubmit}>
                     <p>Login form</p>
 
                     <input
