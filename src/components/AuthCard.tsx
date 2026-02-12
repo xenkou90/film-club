@@ -14,9 +14,12 @@ export default function AuthCard() {
         confirmPassword: "",
     });
 
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         setLogin({ email: "", password: "" });
         setRegister({ email: "", password: "", confirmPassword: "" });
+        setError(null);
     }, [mode]);
 
     const updateLogin = (patch: Partial<typeof login>) => {
@@ -30,6 +33,8 @@ export default function AuthCard() {
     const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
+        setError(null);
+
         console.log("Submitting login:");
         console.log("Email:", login.email);
         console.log("Password:", login.password);
@@ -39,9 +44,11 @@ export default function AuthCard() {
         e.preventDefault();
 
         if (register.password !== register.confirmPassword) {
-            console.log("Passwords do not match");
+            setError("Passwords do not match");
             return;
         }
+
+        setError(null);
 
         console.log("Submitting register:");
         console.log("Email:", register.email);
@@ -56,6 +63,8 @@ export default function AuthCard() {
                 <button type="button" onClick={() => setMode("login")}>Login</button>
                 <button type="button" onClick={() => setMode("register")}>Register</button>
             </div> 
+
+            {error && <p role="alert">{error}</p>}
 
             {mode === "login" && (
                 <form onSubmit={handleLoginSubmit}>
