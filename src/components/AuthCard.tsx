@@ -15,9 +15,17 @@ export default function AuthCard() {
     });
 
     useEffect(() => {
-        setLogin({ email: "", password: ""});
-        setRegister({ email: "", password: "", confirmPassword: ""});
+        setLogin({ email: "", password: "" });
+        setRegister({ email: "", password: "", confirmPassword: "" });
     }, [mode]);
+
+    const updateLogin = (patch: Partial<typeof login>) => {
+        setLogin((prev) => ({ ...prev, ...patch }));
+    };
+
+    const updateRegister = (patch: Partial<typeof register>) => {
+        setRegister((prev) => ({ ...prev, ...patch }));
+    };
 
     const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -57,14 +65,14 @@ export default function AuthCard() {
                         type="email"
                         placeholder="Email"
                         value={login.email}
-                        onChange={(e) => setLogin({ ...login, email: e.target.value })}
+                        onChange={(e) => updateLogin({ email: e.target.value })}
                     />
 
                     <input
                         type="password"
                         placeholder="Password"
                         value={login.password}
-                        onChange={(e) => setLogin({ ...login, password: e.target.value })}
+                        onChange={(e) => updateLogin({ password: e.target.value })}
                     />
 
                     <button type="submit">Enter</button>
@@ -81,21 +89,21 @@ export default function AuthCard() {
                         type="email"
                         placeholder="Email"
                         value={register.email}
-                        onChange={(e) => setRegister({ ...register, email: e.target.value })}
+                        onChange={(e) => updateRegister({ email: e.target.value })}
                     />
 
                     <input
                         type="password"
                         placeholder="Password"
                         value={register.password}
-                        onChange={(e) => setRegister({ ...register, password: e.target.value })}
+                        onChange={(e) => updateRegister({ password: e.target.value })}
                     />
 
                     <input
                         type="password"
                         placeholder="Confirm Password"
                         value={register.confirmPassword}
-                        onChange={(e) => setRegister({ ...register, confirmPassword: e.target.value })}
+                        onChange={(e) => updateRegister({ confirmPassword: e.target.value })}
                     />
                     
                     <button type="submit">Create account</button>
