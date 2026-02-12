@@ -30,6 +30,14 @@ export default function AuthCard() {
         setRegister((prev) => ({ ...prev, ...patch }));
     };
 
+    const loginIsValid = login.email.trim() !== "" && login.password.length >= 8;
+
+    const registerIsValid =
+        register.email.trim() !== "" &&
+        register.password.length >= 8 &&
+        register.confirmPassword.length >= 8 &&
+        register.password === register.confirmPassword; 
+
     const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
@@ -84,7 +92,13 @@ export default function AuthCard() {
                         onChange={(e) => updateLogin({ password: e.target.value })}
                     />
 
-                    <button type="submit">Enter</button>
+                    <button 
+                        type="submit"
+                        disabled={!loginIsValid}
+                        title={!loginIsValid ? "Email must not be empty and password must be at least 8 characters" : ""}
+                    >
+                        Enter
+                    </button>
 
                 </form>
 
@@ -115,7 +129,14 @@ export default function AuthCard() {
                         onChange={(e) => updateRegister({ confirmPassword: e.target.value })}
                     />
                     
-                    <button type="submit">Create account</button>
+                    <button 
+                        type="submit"
+                        disabled={!registerIsValid}
+                        title={!registerIsValid ? "Email must not be empty, password must be at least 8 characters, and passwords must match" : ""}
+                    >
+                        Create account
+                    </button>
+
                 </form>
             )}
         </div>
