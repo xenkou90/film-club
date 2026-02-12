@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Mode = "login" | "register";
 
@@ -15,6 +15,15 @@ export default function AuthCard() {
     const[registerEmail, setRegisterEmail] = useState("");
     const[registerPassword, setRegisterPassword] = useState("");
     const[confirmPassword, setConfirmPassword] = useState("");
+
+    useEffect(() => {
+        setEmail("");
+        setPassword("");
+
+        setRegisterEmail("");
+        setRegisterPassword("");
+        setConfirmPassword("");
+    }, [mode]);
 
     const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
