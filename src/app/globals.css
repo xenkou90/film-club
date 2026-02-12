@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #a78bfa;
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -27,7 +27,7 @@ body {
 
 @layer components {
   .brut-card {
-    @apply bg-white border-[3px] border-black rounded-2xl shadow-[8px_8px_0_0_#000] p-5;
+    @apply bg-[#f3f0ff] text-black border-[3px] border-black rounded-2xl shadow-[8px_8px_0_0_#000] p-5;
   }
 
   .brut-input {

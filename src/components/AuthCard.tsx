@@ -85,7 +85,7 @@ export default function AuthCard() {
                     onClick={() => setMode("login")}
                     className={[
                         "brut-tab",
-                        mode === "login" ? "bg-black text-white" : "bg-white text-black",
+                        mode === "login" ? "bg-[#1f046e] text-white" : "bg-white text-black",
                     ].join(" ")}
                     aria-pressed={mode === "login"}
                 >
@@ -97,7 +97,7 @@ export default function AuthCard() {
                     onClick={() => setMode("register")}
                     className={[
                         "brut-tab",
-                        mode === "register" ? "bg-black text-white" : "bg-white text-black",
+                        mode === "register" ? "bg-[#1f046e] text-white" : "bg-white text-black",
                     ].join(" ")}
                     aria-pressed={mode === "register"}
                 >
