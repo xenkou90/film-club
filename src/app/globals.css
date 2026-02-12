@@ -24,3 +24,26 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer components {
+  .brut-card {
+    @apply bg-white border-[3px] border-black rounded-2xl shadow-[8px_8px_0_0_#000] p-5;
+  }
+
+  .brut-input {
+    @apply w-full bg-white border-[3px] border-black rounded-xl px-3 py-3 font-bold outline-none;
+  }
+
+  .brut-input:focus {
+    box-shadow: 6px 6px 0 0 #000;
+    transform: translate(-1px, -1px);
+  }
+
+  .brut-btn {
+    @apply w-full border-[3px] border-black rounded-xl px-4 py-3 font-extrabold uppercase tracking-wider shadow-[8px_8px_0_0_#000] active:translate-x-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .brut-tab {
+    @apply border-[3px] border-black px-3 py-2 text-xs font-extrabold uppercase tracking-wider;
+  }
+}

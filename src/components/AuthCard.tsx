@@ -64,35 +64,82 @@ export default function AuthCard() {
     };
 
     return (
-        <div>
-            <h1>{mode === "login" ? "Login" : "Register"}</h1>
+        <section className="w-full max-w-md">
+        <div className="brut-card">
+            <div className="flex items-start justify-between gap-4">
+                </div>
+                    <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                        Film Club
+                    </p>
+                    <h1 className="mt-2 text-2xl font-extrabold leading-tight">
+                        {mode === "login" ? "Enter the club." : "Join the club."}
+                    </h1>
+                    <p className="mt-2 text-sm opacity-90">
+                        Monthly theme. Five Picks. One winner.
+                    </p>
+                
 
-            <div>
-                <button type="button" onClick={() => setMode("login")}>Login</button>
-                <button type="button" onClick={() => setMode("register")}>Register</button>
-            </div> 
+            <div className="flex shrink-0 overflow-hidden rounded-lg border-[3px] border-black">
+                <button
+                    type="button"
+                    onClick={() => setMode("login")}
+                    className={[
+                        "brut-tab",
+                        mode === "login" ? "bg-black text-white" : "bg-white text-black",
+                    ].join(" ")}
+                    aria-pressed={mode === "login"}
+                >
+                    Login
+                </button>
 
-            {error && <p role="alert">{error}</p>}
+                <button
+                    type="button"
+                    onClick={() => setMode("register")}
+                    className={[
+                        "brut-tab",
+                        mode === "register" ? "bg-black text-white" : "bg-white text-black",
+                    ].join(" ")}
+                    aria-pressed={mode === "register"}
+                >
+                    Register
+                </button>
+            </div>
+
+            {error && (
+                <p 
+                    role="alert"
+                    className="mt-4 border-[3px] border-black rounded-xl px-3 py-2 font-bold bg-[#ffd6d6]"
+                >
+                    {error}
+                </p>
+                )}
 
             {mode === "login" && (
-                <form onSubmit={handleLoginSubmit}>
-                    <p>Login form</p>
+                <form onSubmit={handleLoginSubmit} className="mt-6 grid gap-4">
+                    <label className="grid gap-2">
+                        <span className="text-xs font-extrabold uppercase tracking-wider">Email</span>
+                        <input
+                            className="brut-input"
+                            type="email"
+                            placeholder="you@club.com"
+                            value={login.email}
+                            onChange={(e) => updateLogin({ email: e.target.value })}
+                        />
+                    </label>
 
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={login.email}
-                        onChange={(e) => updateLogin({ email: e.target.value })}
-                    />
-
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={login.password}
-                        onChange={(e) => updateLogin({ password: e.target.value })}
-                    />
+                    <label className="grid gap-2">
+                        <span className="text-xs font-extrabold uppercase tracking-wider">Password</span>
+                        <input
+                            className="brut-input"
+                            type="password"
+                            placeholder="••••••••"
+                            value={login.password}
+                            onChange={(e) => updateLogin({ password: e.target.value })}
+                        />
+                    </label>
 
                     <button 
+                        className="brut-btn bg-[#b8ff66]"
                         type="submit"
                         disabled={!loginIsValid}
                         title={!loginIsValid ? "Email must not be empty and password must be at least 8 characters" : ""}
@@ -105,29 +152,39 @@ export default function AuthCard() {
             )}
 
             {mode === "register" && (
-                <form onSubmit={handleRegisterSubmit}>
-                    <p>Register form</p>
+                <form onSubmit={handleRegisterSubmit} className="mt-6 grid gap-4">
+                    <label className="grid gap-2">
+                        <span className="text-xs font-extrabold uppercase tracking-wider">Email</span>
+                        <input
+                            className="brut-input"
+                            type="email"
+                            placeholder="you@club.com"
+                            value={register.email}
+                            onChange={(e) => updateRegister({ email: e.target.value })}
+                        />
+                    </label>
 
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={register.email}
-                        onChange={(e) => updateRegister({ email: e.target.value })}
-                    />
-
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={register.password}
-                        onChange={(e) => updateRegister({ password: e.target.value })}
-                    />
-
-                    <input
-                        type="password"
-                        placeholder="Confirm Password"
-                        value={register.confirmPassword}
-                        onChange={(e) => updateRegister({ confirmPassword: e.target.value })}
-                    />
+                    <label className="grid gap-2">
+                        <span className="text-xs font-extrabold uppercase tracking-wider">Password</span>
+                        <input
+                            className="brut-input"
+                            type="password"
+                            placeholder="Password"
+                            value={register.password}
+                            onChange={(e) => updateRegister({ password: e.target.value })}
+                        />
+                    </label>
+                    
+                    <label className="grid gap-2">
+                        <span className="text-xs font-extrabold uppercase tracking-wider">Password</span>
+                        <input
+                            className="brut-input"
+                            type="password"
+                            placeholder="Confirm Password"
+                            value={register.confirmPassword}
+                            onChange={(e) => updateRegister({ confirmPassword: e.target.value })}
+                        />
+                    </label>
                     
                     <button 
                         type="submit"
@@ -140,5 +197,6 @@ export default function AuthCard() {
                 </form>
             )}
         </div>
+        </section>
     );
 }
