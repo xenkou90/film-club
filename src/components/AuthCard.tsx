@@ -7,43 +7,37 @@ type Mode = "login" | "register";
 export default function AuthCard() {
     const [mode, setMode] = useState<Mode>("login");
 
-    // Login state
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-
-    // Register state
-    const[registerEmail, setRegisterEmail] = useState("");
-    const[registerPassword, setRegisterPassword] = useState("");
-    const[confirmPassword, setConfirmPassword] = useState("");
+    const [login, setLogin] = useState({ email: "", password: "" });
+    const [register, setRegister] = useState({
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
 
     useEffect(() => {
-        setEmail("");
-        setPassword("");
-
-        setRegisterEmail("");
-        setRegisterPassword("");
-        setConfirmPassword("");
+        setLogin({ email: "", password: ""});
+        setRegister({ email: "", password: "", confirmPassword: ""});
     }, [mode]);
 
     const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
         console.log("Submitting login:");
-        console.log("Email:", email);
-        console.log("Password:", password);
+        console.log("Email:", login.email);
+        console.log("Password:", login.password);
     };
 
     const handleRegisterSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        if (registerPassword !== confirmPassword) {
+        if (register.password !== register.confirmPassword) {
             console.log("Passwords do not match");
             return;
         }
 
         console.log("Submitting register:");
-        console.log("Email:", registerEmail);
-        console.log("Password:", registerPassword);
+        console.log("Email:", register.email);
+        console.log("Password:", register.password);
     };
 
     return (
@@ -62,15 +56,15 @@ export default function AuthCard() {
                     <input
                         type="email"
                         placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={login.email}
+                        onChange={(e) => setLogin({ ...login, email: e.target.value })}
                     />
 
                     <input
                         type="password"
                         placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={login.password}
+                        onChange={(e) => setLogin({ ...login, password: e.target.value })}
                     />
 
                     <button type="submit">Enter</button>
@@ -86,22 +80,22 @@ export default function AuthCard() {
                     <input
                         type="email"
                         placeholder="Email"
-                        value={registerEmail}
-                        onChange={(e) => setRegisterEmail(e.target.value)}
+                        value={register.email}
+                        onChange={(e) => setRegister({ ...register, email: e.target.value })}
                     />
 
                     <input
                         type="password"
                         placeholder="Password"
-                        value={registerPassword}
-                        onChange={(e) => setRegisterPassword(e.target.value)}
+                        value={register.password}
+                        onChange={(e) => setRegister({ ...register, password: e.target.value })}
                     />
 
                     <input
                         type="password"
                         placeholder="Confirm Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        value={register.confirmPassword}
+                        onChange={(e) => setRegister({ ...register, confirmPassword: e.target.value })}
                     />
                     
                     <button type="submit">Create account</button>
