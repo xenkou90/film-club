@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 type Mode = "login" | "register";
 
@@ -64,8 +65,18 @@ export default function AuthCard() {
     };
 
     return (
-        <section className="w-full max-w-md">
-        <div className="brut-card">
+        <section className="w-full max-w-md flex flex-col items-center gap-4">
+
+            <Image
+                src="/logo.png"
+                alt="Film Club Logo"
+                width={2200}
+                height={2200}
+                className="object-contain"
+                priority
+            /> 
+
+        <div className="brut-card w-full">
             <div className="flex items-start justify-between gap-4">
                 </div>
                     <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
