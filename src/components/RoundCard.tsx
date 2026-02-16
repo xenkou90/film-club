@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 type Phase = "voting" | "closed" | "winner";
 
 type RoundCardProps = {
@@ -16,6 +20,16 @@ type RoundCardProps = {
 export default function RoundCard(props: RoundCardProps) {
     const { roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
         props;
+
+    const [selectedMovie, setSelectedMovie] = useState<string | null>(null);
+    const [submitted, setSubmitted] = useState(false);
+
+    function handleVoteSubmit() {
+        if (!selectedMovie) return;
+
+        setSubmitted(true);
+        console.log("Voted for:", selectedMovie);
+    }
 
     return (
         <div className="brut-card w-full">
@@ -37,14 +51,45 @@ export default function RoundCard(props: RoundCardProps) {
                         <p className="mt-1 font-extrabold">Voting Open (Day 1-5)</p>
                         
                         <div className="mt-4 grid gap-3">
-                            {movies.map((title) => (
-                                <button key={title} type="button" className="brut-btn bg-white">
-                                    Vote: {title}
-                                </button>
-                            ))}
+                            {movies.map((title) => {
+                                const isSelected = selectedMovie === title;
+
+                                return (
+                                    <button
+                                        key={title}
+                                        type="button"
+                                        className={[
+                                            "brut-btn",
+                                            isSelected ? "bg-[#1f046e] text-white" : "bg-white text-black",
+                                        ].join(" ")}
+                                        onClick={() => setSelectedMovie(title)}
+                                        disabled={submitted}
+                                        title={submitted ? "Vote submitted" : ""}
+                                    >
+                                        {isSelected ? "Selected: " : "Vote: "}
+                                        {title}
+                                    </button>
+                                );
+                            })}
                         </div>
+
+                        <button
+                            type="button"
+                            className="brut-btn bg-[#b8ff66]"
+                            onClick={handleVoteSubmit}
+                            disabled={!selectedMovie || submitted}
+                            title={!selectedMovie ? "Pick a movie first" : submitted ? "Vote submitted" : ""}
+                        >
+                            {submitted ? "Vote submitted" : "Submit Vote"}
+                        </button>
+
+                        {submitted && (
+                            <p className="mt-3 text-sm font-bold">
+                                Locked in: {selectedMovie}
+                            </p>
+                        )}
                         
-                        <p className="mt-4 text-xs opacity-80">
+                        <p className="mt-4 text-xs text-center opacity-80">
                             You can vote once. Voting closes on Day 6.
                         </p>
                     </>
