@@ -2,6 +2,20 @@
 
 import { useState } from "react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+
+
 type Phase = "voting" | "closed" | "winner";
 
 type RoundCardProps = {
@@ -73,15 +87,54 @@ export default function RoundCard(props: RoundCardProps) {
                             })}
                         </div>
 
-                        <button
-                            type="button"
-                            className="brut-btn bg-[#b8ff66]"
-                            onClick={handleVoteSubmit}
-                            disabled={!selectedMovie || submitted}
-                            title={!selectedMovie ? "Pick a movie first" : submitted ? "Vote submitted" : ""}
-                        >
-                            {submitted ? "Vote submitted" : "Submit Vote"}
-                        </button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    className="brut-btn bg-[#b8ff66]"
+                                    disabled={!selectedMovie || submitted}
+                                    title={
+                                        !selectedMovie
+                                            ? "Pick a movie first"
+                                            : submitted
+                                            ? "Vote submitted"
+                                            : ""
+                                    }
+                                >
+                                    {submitted ? "Vote submitted" : "Submit vote"}
+                                </Button>
+                            </AlertDialogTrigger>
+
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-xl font-extrabold">
+                                        Confirm your vote
+                                    </AlertDialogTitle>
+
+                                    <AlertDialogDescription className="text-sm font-bold opacity-90">
+                                        You're about to vote for{" "}
+                                        <span className="underline">{selectedMovie ?? "—"}</span>.
+                                        {` `}
+                                        This will lock your vote.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel asChild>
+                                        <Button className="brut-btn bg-white">Cancel</Button>
+                                    </AlertDialogCancel>
+
+                                    <AlertDialogAction asChild>
+                                        <Button
+                                            className="brut-btn bg-[#1f046e] text-white"
+                                            onClick={handleVoteSubmit}
+                                        >
+                                            Confirm
+                                        </Button>
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
 
                         {submitted && (
                             <p className="mt-3 text-sm font-bold">
