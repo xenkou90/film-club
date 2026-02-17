@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 type Phase = "voting" | "closed" | "winner";
 
 type RoundCardProps = {
+    roundId: string;
     roundTitle: string;
     themeTitle: string;
     themeName: string;
@@ -32,17 +33,41 @@ type RoundCardProps = {
 };
 
 export default function RoundCard(props: RoundCardProps) {
-    const { roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
+    const { roundId, roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
         props;
 
     const [selectedMovie, setSelectedMovie] = useState<string | null>(null);
     const [submitted, setSubmitted] = useState(false);
 
-    function handleVoteSubmit() {
+    const userId = "xeno"; // temporary; later comes from auth
+
+    async function handleVoteSubmit() {
         if (!selectedMovie) return;
 
-        setSubmitted(true);
-        console.log("Voted for:", selectedMovie);
+        try {
+            const res = await fetch("/api/vote", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    roundId,
+                    userId,
+                    movie: selectedMovie,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                // show server error message (simple for now)
+                console.log("Vote failed:", data?.error ?? "Unknown error");
+                return;
+            }
+
+            setSubmitted(true);
+            console.log("Vote saved:", data);
+        } catch (err) {
+            console.log("Network error:", err);
+        }
     }
 
     return (
