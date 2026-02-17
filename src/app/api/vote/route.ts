@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { round, upsertVote } from "@/lib/store";
+import { round, upsertVote, votes } from "@/lib/store";
 
 type VoteRequestBody = {
     roundId: string;
@@ -43,4 +43,23 @@ export async function POST(req: Request) {
     const vote = upsertVote(roundId, userId, movie);
 
     return NextResponse.json({ ok: true, vote});
+}
+
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+
+    const roundId = searchParams.get("roundId");
+    const userId = searchParams.get("userId");
+
+    if (!roundId || !userId) {
+        return NextResponse.json(
+            { error: "roundId and userId are required" },
+            { status: 400 }
+        );
+    }
+
+    const vote = 
+    votes.find((v) => v.roundId === roundId && v.userId === userId) ?? null;
+
+    return NextResponse.json({ ok: true, vote });
 }

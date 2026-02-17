@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 type Phase = "voting" | "closed" | "winner";
 
 type RoundCardProps = {
+    userId: string;
+    initialVoteMovie?: string | null;
     roundId: string;
     roundTitle: string;
     themeTitle: string;
@@ -33,13 +35,13 @@ type RoundCardProps = {
 };
 
 export default function RoundCard(props: RoundCardProps) {
-    const { roundId, roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
+    const { userId, initialVoteMovie, roundId, roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
         props;
 
-    const [selectedMovie, setSelectedMovie] = useState<string | null>(null);
-    const [submitted, setSubmitted] = useState(false);
-
-    const userId = "xeno"; // temporary; later comes from auth
+    const [selectedMovie, setSelectedMovie] = useState<string | null>(
+        initialVoteMovie ?? null
+    );
+    const [submitted, setSubmitted] = useState(Boolean(initialVoteMovie));
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [voteError, setVoteError] = useState<string | null>(null);

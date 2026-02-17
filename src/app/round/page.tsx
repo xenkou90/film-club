@@ -15,6 +15,8 @@ type RoundData = {
     };
 };
 
+const userId = "xeno";
+
 async function getRoundData(): Promise<RoundData> {
     // IMPORTANT: one the server, use an absolute URL
     const res = await fetch("http://localhost:3000/api/round", {
@@ -28,13 +30,31 @@ async function getRoundData(): Promise<RoundData> {
     return res.json();
 }
 
+async function getUserVote(roundId: string, userId: string) {
+    const res = await fetch(
+        `http://localhost:3000/api/vote?roundId=${encodeURIComponent(
+      roundId
+    )}&userId=${encodeURIComponent(userId)}`,
+    { cache: "no-store" }
+    );
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return data.vote ?? null;
+}
+
 export default async function RoundPage() {
     const data = await getRoundData();
+
+    const vote = await getUserVote(data.id, userId);
 
     return (
         <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
             <section className="w-full max-w-md">
                 <RoundCard 
+                    initialVoteMovie={vote?.movie ?? null}
+                    userId={userId}
                     roundId={data.id}
                     roundTitle={data.roundTitle}
                     themeTitle={data.themeTitle}
