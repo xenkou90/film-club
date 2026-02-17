@@ -1,5 +1,5 @@
 import RoundCard from "@/components/RoundCard";
-import type { Phase } from "@/app/api/round/route";
+import type { Phase } from "@/lib/types";
 
 type RoundData = {
     id: string;
