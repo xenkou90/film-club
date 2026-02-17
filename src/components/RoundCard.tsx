@@ -41,8 +41,16 @@ export default function RoundCard(props: RoundCardProps) {
 
     const userId = "xeno"; // temporary; later comes from auth
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [voteError, setVoteError] = useState<string | null>(null);
+    const [voteSuccess, setVoteSuccess] = useState<string | null>(null);
+
     async function handleVoteSubmit() {
         if (!selectedMovie) return;
+
+        setVoteError(null);
+        setVoteSuccess(null);
+        setIsSubmitting(true);
 
         try {
             const res = await fetch("/api/vote", {
@@ -58,15 +66,16 @@ export default function RoundCard(props: RoundCardProps) {
             const data = await res.json();
 
             if (!res.ok) {
-                // show server error message (simple for now)
-                console.log("Vote failed:", data?.error ?? "Unknown error");
+                setVoteError(data?.error ?? "Vote failed.");
                 return;
             }
 
             setSubmitted(true);
-            console.log("Vote saved:", data);
+            setVoteSuccess("Vote saved: ${selectedMovie}");
         } catch (err) {
-            console.log("Network error:", err);
+            setVoteError("Network error. Try again.");
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -89,6 +98,18 @@ export default function RoundCard(props: RoundCardProps) {
                     <>
                         <p className="mt-1 font-extrabold">Voting Open (Day 1-5)</p>
                         
+                        {voteError && (
+                            <p role="alert" className="mt-4 border-[3px] border-black rounded-xl px-3 py-2 font-bold bg-[#ffd6d6]">
+                                {voteError}
+                            </p>
+                        )}
+
+                        {voteSuccess && (
+                            <p className="mt-4 border-[3px] border-black rounded-xl px-3 py-2 font-bold bg-[#d7fff0]">
+                                {voteSuccess}
+                            </p>
+                        )}
+
                         <div className="mt-4 grid gap-3">
                             {movies.map((title) => {
                                 const isSelected = selectedMovie === title;
@@ -152,8 +173,9 @@ export default function RoundCard(props: RoundCardProps) {
                                         <Button
                                             className="brut-btn bg-[#1f046e] text-white"
                                             onClick={handleVoteSubmit}
+                                            disabled={isSubmitting || submitted}
                                         >
-                                            Confirm
+                                            {isSubmitting ? "Submitting..." : "Confirm"}
                                         </Button>
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
