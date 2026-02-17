@@ -27,7 +27,7 @@ type RoundCardProps = {
     themeName: string;
     phase: Phase;
     movies: string[];
-    winnerMovie: string;
+    winnerMovie?: string;
     meeting?: {
         dateText: string;
         placeText: string;
