@@ -1,24 +1,39 @@
 import RoundCard from "@/components/RoundCard";
+import type { Phase } from "@/app/api/round/route";
 
-type Phase = "voting" | "closed" | "winner";
+type RoundData = {
+    roundTitle: string;
+    themeTitle: string;
+    themeName: string;
+    phase: Phase;
+    movies: string[];
+    winnerMovie?: string;
+    meeting?: {
+        dateText: string;
+        placeText: string;
+    };
+};
 
-export default function RoundPage() {
-    const phase: Phase = "voting"; // Change this to "voting", "closed", or "winner" to test different phases
+async function getRoundData(): Promise<RoundData> {
+    // IMPORTANT: one the server, use an absolute URL
+    const res = await fetch("http://localhost:3000/api/round", {
+        cache: "no-store", // always fresh during dev
+    });
 
-    const movies = ["Movie 1", "Movie 2", "Movie 3", "Movie 4", "Movie 5"];
+    if (!res.ok) {
+        throw new Error("Failed to fetch round data");
+    }
+
+    return res.json();
+}
+
+export default async function RoundPage() {
+    const data = await getRoundData();
 
     return (
         <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
             <section className="w-full max-w-md">
-                <RoundCard
-                    roundTitle="Movie Night #1 - May 2026"
-                    themeTitle="Theme of the Month"
-                    themeName="Neon Nights"
-                    phase={phase}
-                    movies={movies}
-                    winnerMovie="Movie 3"
-                    meeting={{ dateText: "May 24, 20:30", placeText: "You know where!" }}
-                />
+                <RoundCard {...data} />
             </section>
         </main>
     );
