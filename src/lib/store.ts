@@ -13,7 +13,7 @@ export type RoundData = {
 
 export type Vote = {
     roundId: string;
-    userID: string;
+    userId: string;
     movie: string;
     createdAt: string;
 };
