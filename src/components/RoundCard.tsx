@@ -71,7 +71,7 @@ export default function RoundCard(props: RoundCardProps) {
             }
 
             setSubmitted(true);
-            setVoteSuccess("Vote saved: ${selectedMovie}");
+            setVoteSuccess(`Vote saved: ${selectedMovie}`);
         } catch (err) {
             setVoteError("Network error. Try again.");
         } finally {
