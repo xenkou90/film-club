@@ -21,6 +21,7 @@ type Phase = "voting" | "closed" | "winner";
 type RoundCardProps = {
     userId: string;
     initialVoteMovie?: string | null;
+    voteCounts?: Record<string, number>;
     roundId: string;
     roundTitle: string;
     themeTitle: string;
@@ -35,7 +36,7 @@ type RoundCardProps = {
 };
 
 export default function RoundCard(props: RoundCardProps) {
-    const { userId, initialVoteMovie, roundId, roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
+    const { userId, initialVoteMovie, voteCounts, roundId, roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
         props;
 
     const [selectedMovie, setSelectedMovie] = useState<string | null>(
@@ -128,8 +129,16 @@ export default function RoundCard(props: RoundCardProps) {
                                         disabled={submitted}
                                         title={submitted ? "Vote submitted" : ""}
                                     >
-                                        {isSelected ? "Selected: " : "Vote: "}
-                                        {title}
+                                        <span className="flex w-full items-center justify-between gap-3">
+                                            <span className="font-extrabold">
+                                                {isSelected ? "Selected: " : "Vote: "}
+                                                {title}
+                                            </span>
+
+                                            <span className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                                                {voteCounts?.[title] ?? 0} votes
+                                            </span>
+                                        </span>
                                     </button>
                                 );
                             })}

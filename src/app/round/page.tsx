@@ -1,6 +1,8 @@
 import RoundCard from "@/components/RoundCard";
 import type { Phase } from "@/lib/types";
 
+type VoteCounts = Record<string, number>;
+
 type RoundData = {
     id: string;
     roundTitle: string;
@@ -44,10 +46,26 @@ async function getUserVote(roundId: string, userId: string) {
     return data.vote ?? null;
 }
 
+async function getVoteCounts(roundId: string): Promise<VoteCounts> {
+    const res = await fetch(
+        `http://localhost:3000/api/votes?roundId=${encodeURIComponent(roundId)}`,
+        { cache: "no-store" }
+    );
+
+    if (!res.ok) {
+        return {};
+    }
+
+    const data: { ok: boolean; counts: VoteCounts } = await res.json();
+    return data.counts ?? {};
+}
+
 export default async function RoundPage() {
     const data = await getRoundData();
 
     const vote = await getUserVote(data.id, userId);
+
+    const voteCounts = await getVoteCounts(data.id);
 
     return (
         <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
@@ -63,6 +81,7 @@ export default async function RoundPage() {
                     movies={data.movies}
                     winnerMovie={data.winnerMovie}
                     meeting={data.meeting}
+                    voteCounts={voteCounts}
                 />
             </section>
         </main>
