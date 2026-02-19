@@ -89,6 +89,13 @@ export default function RoundCard(props: RoundCardProps) {
         }
     }
 
+    function handleChangeVote() {
+        setSubmitted(false);
+        setSelectedMovie(null);
+        setVoteError(null);
+        setVoteSuccess(null);
+    }
+
     async function refreshVoteCounts() {
         try {
             const res = await fetch(`/api/votes?roundId=${encodeURIComponent(roundId)}`, {
@@ -220,9 +227,20 @@ export default function RoundCard(props: RoundCardProps) {
 
 
                         {submitted && (
-                            <p className="mt-3 text-sm font-bold">
-                                Locked in: {selectedMovie}
-                            </p>
+                            <div className="mt-4 border-[3px] border-black rounded-xl p-4 bg-white">
+                                <p className="text-sm font-extrabold">
+                                    Locked in: {selectedMovie}
+                                </p>
+
+                                <button
+                                    type="button"
+                                    className="mt-3 brut-btn bg-[#66d9ff]"
+                                    onClick={handleChangeVote}
+                                    disabled={isSubmitting}
+                                >
+                                    Change Vote
+                                </button>
+                            </div>
                         )}
                         
                         <p className="mt-4 text-xs text-center opacity-80">
