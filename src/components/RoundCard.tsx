@@ -48,6 +48,10 @@ export default function RoundCard(props: RoundCardProps) {
     const [voteError, setVoteError] = useState<string | null>(null);
     const [voteSuccess, setVoteSuccess] = useState<string | null>(null);
 
+    const [liveVoteCounts, setLiveVoteCounts] = useState<Record<string, number> | null>(null);
+
+    const displayVoteCounts = liveVoteCounts ?? voteCounts ?? {};
+
     async function handleVoteSubmit() {
         if (!selectedMovie) return;
 
@@ -75,10 +79,31 @@ export default function RoundCard(props: RoundCardProps) {
 
             setSubmitted(true);
             setVoteSuccess(`Vote saved: ${selectedMovie}`);
+
+            await refreshVoteCounts();
+
         } catch (err) {
             setVoteError("Network error. Try again.");
         } finally {
             setIsSubmitting(false);
+        }
+    }
+
+    async function refreshVoteCounts() {
+        try {
+            const res = await fetch(`/api/votes?roundId=${encodeURIComponent(roundId)}`, {
+                cache: "no-store",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                return;
+            }
+
+            setLiveVoteCounts(data.counts ?? {});
+        } catch {
+            // ignore for now
         }
     }
 
@@ -136,7 +161,7 @@ export default function RoundCard(props: RoundCardProps) {
                                             </span>
 
                                             <span className="text-xs font-extrabold tracking-widest uppercase opacity-80">
-                                                {voteCounts?.[title] ?? 0} votes
+                                                {displayVoteCounts?.[title] ?? 0} votes
                                             </span>
                                         </span>
                                     </button>
