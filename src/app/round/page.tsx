@@ -1,3 +1,4 @@
+import { getSiteUrl } from "@/lib/site-url";
 import RoundCard from "@/components/RoundCard";
 import type { Phase } from "@/lib/types";
 
@@ -21,7 +22,7 @@ const userId = "xeno";
 
 async function getRoundData(): Promise<RoundData> {
     // IMPORTANT: one the server, use an absolute URL
-    const res = await fetch("http://localhost:3000/api/round", {
+    const res = await fetch(`${getSiteUrl()}/api/round`, {
         cache: "no-store", // always fresh during dev
     });
 
@@ -34,7 +35,7 @@ async function getRoundData(): Promise<RoundData> {
 
 async function getUserVote(roundId: string, userId: string) {
     const res = await fetch(
-        `http://localhost:3000/api/vote?roundId=${encodeURIComponent(
+        `${getSiteUrl()}/api/vote?roundId=${encodeURIComponent(
       roundId
     )}&userId=${encodeURIComponent(userId)}`,
     { cache: "no-store" }
@@ -48,7 +49,7 @@ async function getUserVote(roundId: string, userId: string) {
 
 async function getVoteCounts(roundId: string): Promise<VoteCounts> {
     const res = await fetch(
-        `http://localhost:3000/api/votes?roundId=${encodeURIComponent(roundId)}`,
+        `${getSiteUrl()}/api/votes?roundId=${encodeURIComponent(roundId)}`,
         { cache: "no-store" }
     );
 
