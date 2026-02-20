@@ -1,11 +1,15 @@
 import RoundCard from "@/components/RoundCard";
 
 type AdminPageProps = {
-    searchParams?: { key?: string};
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function AdminPage({ searchParams }: AdminPageProps) {
-    const adminKey = searchParams?.key ?? "";
+export default async function Adminpage(props: AdminPageProps) {
+    const sp = props.searchParams ? await props.searchParams : {};
+    const adminKeyRaw = sp["key"];
+    const adminKey = Array.isArray(adminKeyRaw) ? adminKeyRaw[0] : adminKeyRaw ?? "";
+
+
     const expectedKey = process.env.ADMIN_KEY ?? "";
 
     const allowed = expectedKey.length > 0 && adminKey === expectedKey;
