@@ -59,3 +59,47 @@ export function upsertVote(roundId: string, userId: string, movie: string) {
 export function setRoundPhase(newPhase: Phase) {
     round.phase = newPhase;
 }
+
+export function computeVoteCounts(roundId: string) {
+    // Create a stable counts object: every movie starts at 0
+    const counts: Record<string, number> = Object.fromEntries(
+        round.movies.map((m) => [m, 0]) 
+    );
+
+    // Add +1 for every vote that matches the round and a valid movie
+    for (const v of votes) {
+        if (v.roundId === roundId && typeof counts[v.movie] === "number") {
+            counts[v.movie] += 1;
+        }
+    }
+
+    return counts;
+}
+
+export function pickWinnerForRound(roundId: string) {
+    const counts = computeVoteCounts(roundId);
+
+    // Find the maximum vote count
+    const maxVotes = Math.max(...Object.values(counts));
+
+    // Get all movies tied for maxVotes
+    const tied = Object.entries(counts)
+        .filter(([, c]) => c === maxVotes)
+        .map(([movie]) => movie);
+
+    // If nobody voted, we can't pick a winner
+    if (maxVotes === 0 || tied.length === 0) {
+        return { winner: null as string | null, counts, tied };
+    }
+
+    // If tie, pick randomly among tied
+    const winner =
+        tied.length === 1
+            ? tied[0]
+            : tied[Math.floor(Math.random() * tied.length)];
+
+    // Persist winner in the in-memory "round"
+    round.winnerMovie = winner;
+
+    return { winner, counts, tied };
+}

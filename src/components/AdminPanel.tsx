@@ -1,11 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Phase } from "@/lib/types";
 
 export default function AdminPanel({ adminKey }: { adminKey: string }) {
     const [ status, setStatus] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [roundId, setRoundId] = useState<string | null>(null);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await fetch("/api/round", { cache: "no-store" });
+                const data = await res.json();
+                setRoundId(data.id ?? null);
+            } catch {
+                setRoundId(null);
+            }
+        })();
+    }, []);
 
     async function setPhase(phase: Phase) {
         setIsSubmitting(true);
@@ -26,6 +39,44 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
             }
 
             setStatus(`Phase set to: ${phase}`);
+        } catch {
+            setStatus("Network error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    async function pickWinner() {
+        if (!roundId) {
+            setStatus("Missing roundId. Refresh and try again");
+            return;
+        }
+
+        setIsSubmitting(true);
+        setStatus(null);
+
+        try {
+            const res = await fetch("/api/admin/pick-winner", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key: adminKey, roundId }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setStatus(data?.error ?? "Failed to pick winner");
+                return;
+            }
+
+            // Example status message:
+            // If it was a tie, data.tied will have multiple movies 
+            const tieNote =
+                Array.isArray(data.tied) && data.tied.length > 1
+                    ? ` (tie between: ${data.tied.join(", ")})`
+                    : "";
+            
+            setStatus(`Winner picked: ${data.winner}${tieNote}`);
         } catch {
             setStatus("Network error");
         } finally {
@@ -66,6 +117,16 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                     disabled={isSubmitting}
                 >
                     Set Phase: Closed
+                </button>
+
+                <button
+                    type="button"
+                    className="brut-btn bg-white"
+                    onClick={pickWinner}
+                    disabled={isSubmitting || !roundId}
+                    title={!roundId ? "Loading round..." : ""}
+                >
+                    Pick winner (tie → shuffle)
                 </button>
 
                 <button
