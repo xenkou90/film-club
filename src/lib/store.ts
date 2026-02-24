@@ -55,3 +55,7 @@ export function upsertVote(roundId: string, userId: string, movie: string) {
     votes.push(newVote);
     return newVote;
 }
+
+export function setRoundPhase(newPhase: Phase) {
+    round.phase = newPhase;
+}
