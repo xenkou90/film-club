@@ -22,6 +22,7 @@ type RoundCardProps = {
     userId: string;
     initialVoteMovie?: string | null;
     voteCounts?: Record<string, number>;
+    initialRSVP?: "yes" | "no" | null;
     roundId: string;
     roundTitle: string;
     themeTitle: string;
@@ -36,7 +37,7 @@ type RoundCardProps = {
 };
 
 export default function RoundCard(props: RoundCardProps) {
-    const { userId, initialVoteMovie, voteCounts, roundId, roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
+    const { userId, initialVoteMovie, voteCounts, initialRSVP, roundId, roundTitle, themeTitle, themeName, phase, movies, winnerMovie, meeting } =
         props;
 
     const [selectedMovie, setSelectedMovie] = useState<string | null>(
@@ -51,6 +52,10 @@ export default function RoundCard(props: RoundCardProps) {
     const [liveVoteCounts, setLiveVoteCounts] = useState<Record<string, number> | null>(null);
 
     const displayVoteCounts = liveVoteCounts ?? voteCounts ?? {};
+
+    const [rsvpStatus, setRsvpStatus] = useState<"yes" | "no" | null>(initialRSVP ?? null);
+    const [rsvpError, setRsvpError] = useState<string | null>(null);
+    const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
 
     async function handleVoteSubmit() {
         if (!selectedMovie) return;
@@ -111,6 +116,32 @@ export default function RoundCard(props: RoundCardProps) {
             setLiveVoteCounts(data.counts ?? {});
         } catch {
             // ignore for now
+        }
+    }
+
+    async function submitRSVP(status: "yes" | "no") {
+        setRsvpError(null);
+        setRsvpSubmitting(true);
+
+        try {
+            const res = await fetch("/api/rsvp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ roundId, userId, status }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setRsvpError(data?.error ?? "RSVP failed");
+                return;
+            }
+
+            setRsvpStatus(status);
+        } catch {
+            setRsvpError("Network error");
+        } finally {
+            setRsvpSubmitting(false);
         }
     }
 
@@ -279,12 +310,35 @@ export default function RoundCard(props: RoundCardProps) {
                                 <p>📍 {meeting?.placeText ?? "TBD"}</p>
                             </div>
 
+                            {rsvpError && (
+                                <p role="alert" className="mt-4 border-[3px] border-black rounded-xl px-3 py-2 font-bold bg-[#ffd6d6]">
+                                    {rsvpError}
+                                </p>
+                            )}
+
+                            {rsvpStatus && (
+                                <p className="mt-4 border-[3px] border-black rounded-xl px-3 py-2 font-bold bg-white">
+                                    RSVP: {rsvpStatus === "yes" ? "I am in ✅" : "Can not make it ❌"}
+                                </p>
+                            )}
+
                             <div className="mt-5 grid gap-3">
-                                <button type="button" className="brut-btn bg-[#b8ff66]">
-                                    RSVP: I'm in!
+                                <button
+                                    type="button"
+                                    className="brut-btn bg-[#b8ff66]"
+                                    onClick={() => submitRSVP("yes")}
+                                    disabled={rsvpSubmitting}
+                                >
+                                    {rsvpSubmitting ? "Saving..." : "RSVP: I am in"}
                                 </button>
-                                <button type="button" className="brut-btn bg-white">
-                                    RSVP: Can't make it.
+
+                                <button
+                                    type="button"
+                                    className="brut-btn bg-white"
+                                    onClick={() => submitRSVP("no")}
+                                    disabled={rsvpSubmitting}
+                                >
+                                    {rsvpSubmitting ? "Saving..." : "RSVP: Can not make it"}
                                 </button>
                             </div>
                         </div>

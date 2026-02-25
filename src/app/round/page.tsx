@@ -18,6 +18,15 @@ type RoundData = {
     };
 };
 
+type RSVPStatus = "yes" | "no";
+
+type RSVP = {
+        roundId: string;
+        userId: string;
+        status: RSVPStatus;
+        updatedAt: string;
+};
+
 const userId = "xeno";
 
 async function getRoundData(): Promise<RoundData> {
@@ -61,12 +70,27 @@ async function getVoteCounts(roundId: string): Promise<VoteCounts> {
     return data.counts ?? {};
 }
 
+async function getUserRSVP(roundId: string, userId: string): Promise<RSVP | null> {
+    const base = getSiteUrl();
+    const res = await fetch(
+        `${base}/api/rsvp?roundId=${encodeURIComponent(roundId)}&userId=${encodeURIComponent(userId)}`,
+        { cache: "no-store" }
+    );
+
+    if (!res.ok) return null;
+
+    const data: { ok: boolean; rsvp: RSVP | null } = await res.json();
+    return data.rsvp ?? null;
+}
+
 export default async function RoundPage() {
     const data = await getRoundData();
 
     const vote = await getUserVote(data.id, userId);
 
     const voteCounts = await getVoteCounts(data.id);
+
+    const rsvp = await getUserRSVP(data.id, userId);
 
     return (
         <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
@@ -83,6 +107,7 @@ export default async function RoundPage() {
                     winnerMovie={data.winnerMovie}
                     meeting={data.meeting}
                     voteCounts={voteCounts}
+                    initialRSVP={rsvp?.status ?? null}
                 />
             </section>
         </main>

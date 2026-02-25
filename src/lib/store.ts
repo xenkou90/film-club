@@ -18,6 +18,15 @@ export type Vote = {
     createdAt: string;
 };
 
+export type RSVPStatus = "yes" | "no";
+
+export type RSVP = {
+    roundId: string;
+    userId: string;
+    status: RSVPStatus;
+    updatedAt: string;
+};
+
 // IMPORTANT: This is in-memory (resets when server restarts)
 export const round: RoundData = {
     id: "may-2026",
@@ -31,6 +40,32 @@ export const round: RoundData = {
 };
 
 export const votes: Vote[] = [];
+
+export const rsvps: RSVP[] = [];
+
+export function getUserRSVP(roundId: string, userId: string) {
+    return rsvps.find((r) => r.roundId === roundId && r.userId === userId) ?? null;
+}
+
+export function upsertRSVP(roundId: string, userId: string, status: RSVPStatus) {
+    const existing = getUserRSVP(roundId, userId);
+
+    if (existing) {
+        existing.status = status;
+        existing.updatedAt = new Date().toISOString();
+        return existing;
+    }
+
+    const newRSVP: RSVP = {
+        roundId,
+        userId,
+        status,
+        updatedAt: new Date().toISOString(),
+    };
+
+    rsvps.push(newRSVP);
+    return newRSVP;
+}
 
 export function getUserVote(roundId: string, userId: string) {
     return votes.find((v) => v.roundId === roundId && v.userId === userId) ?? null;
