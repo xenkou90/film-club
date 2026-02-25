@@ -7,6 +7,8 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
     const [ status, setStatus] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [roundId, setRoundId] = useState<string | null>(null);
+    const [meetingDateText, setMeetingDateText] = useState("");
+    const [meetingPlaceText, setMeetingPlaceText] = useState("");
 
     useEffect(() => {
         (async () => {
@@ -84,6 +86,42 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
         }
     }
 
+    async function saveMeeting() {
+        if (!roundId) {
+            setStatus("Missing roundId. Refresh and try again.");
+            return;
+        }
+
+        setIsSubmitting(true);
+        setStatus(null);
+
+        try {
+            const res = await fetch("/api/admin/meeting", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    key: adminKey,
+                    roundId,
+                    dateText: meetingDateText,
+                    placeText: meetingPlaceText,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setStatus(data?.error ?? "Failed to save meeting");
+                return;
+            }
+
+            setStatus("Meeting details saved");
+        } catch {
+            setStatus("Network error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
     return (
         <div className="brut-card w-full">
             <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
@@ -136,6 +174,43 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                     disabled={isSubmitting}
                 >
                     Set Phase: Winner
+                </button>
+            </div>
+
+            <div className="mt-6 grid gap-3">
+                <label className="grid gap-2">
+                    <span className="text-xs font-extrabold uppercase tracking-wider">
+                        Meeting date/time
+                    </span>
+                    <input
+                        className="brut-input"
+                        placeholder="May 24, 20:30"
+                        value={meetingDateText}
+                        onChange={(e) => setMeetingDateText(e.target.value)}
+                        disabled={isSubmitting}
+                    />
+                </label>
+
+                <label className="grid gap-2">
+                    <span className="text-xs font-extrabold uppercase tracking-wider">
+                        Meeting Place
+                    </span>
+                    <input
+                        className="brut-input"
+                        placeholder="You know where!"
+                        value={meetingPlaceText}
+                        onChange={(e) => setMeetingPlaceText(e.target.value)}
+                        disabled={isSubmitting}
+                    />
+                </label>
+
+                <button
+                    type="button"
+                    className="brut-btn bg-[#b8ff66]"
+                    onClick={saveMeeting}
+                    disabled={isSubmitting || !roundId}
+                >
+                    Save meeting details
                 </button>
             </div>
 

@@ -103,3 +103,7 @@ export function pickWinnerForRound(roundId: string) {
 
     return { winner, counts, tied };
 }
+
+export function setMeetingDetails(dateText: string, placeText: string) {
+    round.meeting = { dateText, placeText };
+}
