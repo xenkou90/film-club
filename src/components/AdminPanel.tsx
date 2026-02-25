@@ -9,6 +9,7 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
     const [roundId, setRoundId] = useState<string | null>(null);
     const [meetingDateText, setMeetingDateText] = useState("");
     const [meetingPlaceText, setMeetingPlaceText] = useState("");
+    const [rsvpCounts, setRsvpCounts] = useState<{ yes: number; no: number; total: number } | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -21,6 +22,12 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
             }
         })();
     }, []);
+
+    useEffect(() => {
+        if (!roundId) return;
+        refreshRSVPCounts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [roundId]);
 
     async function setPhase(phase: Phase) {
         setIsSubmitting(true);
@@ -83,6 +90,28 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
             setStatus("Network error");
         } finally {
             setIsSubmitting(false);
+        }
+    }
+
+    async function refreshRSVPCounts() {
+        if (!roundId) return;
+
+        try {
+            const res = await fetch(
+                `/api/admin/rsvp-counts?roundId=${encodeURIComponent(roundId)}&key=${encodeURIComponent(adminKey)}`,
+                { cache: "no-store"}
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setStatus(data?.error ?? "Failed to fetch RSVP totals");
+                return;
+            }
+
+            setRsvpCounts(data.counts ?? null);
+        } catch {
+            setStatus("Network error fetching RSVP totals");
         }
     }
 
@@ -211,6 +240,31 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                     disabled={isSubmitting || !roundId}
                 >
                     Save meeting details
+                </button>
+            </div>
+
+            <div className="mt-6 border-[3px] border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                    RSVP totals
+                </p>
+
+                {rsvpCounts ? (
+                    <div className="mt-2 grid gap-1 font-bold">
+                        <p>✅ Yes: {rsvpCounts.yes}</p>
+                        <p>❌ No: {rsvpCounts.no}</p>
+                        <p>👥 Total replies: {rsvpCounts.total}</p>
+                    </div>
+                ) : (
+                    <p className="mt-2 font-bold opacity-80">No RSVP data yet.</p>
+                )}
+
+                <button
+                    type="button"
+                    className="mt-4 brut-btn bg-[#66d9ff]"
+                    onClick={refreshRSVPCounts}
+                    disabled={isSubmitting || !roundId}
+                >
+                    Refresh RSVP totals
                 </button>
             </div>
 

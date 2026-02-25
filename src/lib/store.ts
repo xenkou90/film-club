@@ -139,6 +139,19 @@ export function pickWinnerForRound(roundId: string) {
     return { winner, counts, tied };
 }
 
+export function computeRSVPCounts(roundId: string) {
+    let yes = 0;
+    let no = 0;
+
+    for (const r of rsvps) {
+        if (r.roundId !== roundId) continue;
+        if (r.status === "yes") yes += 1;
+        if (r.status === "no") no += 1;
+    }
+
+    return { yes, no, total: yes + no };
+}
+
 export function setMeetingDetails(dateText: string, placeText: string) {
     round.meeting = { dateText, placeText };
 }
