@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { round, votes } from "@/lib/store";
+import { db } from "@/db";
+import { votes } from "@/db/schema";
+import { round } from "@/lib/store";
+import { eq, sql } from "drizzle-orm";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -13,15 +16,24 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Unknown round" }, { status: 404 });
     }
 
-    // Start counts with 0 for every movie (stable ordering)
+    // DB counts by movie
+    const rows = await db
+        .select({
+            movie: votes.movie,
+            count: sql<number>`count(*)`.mapWith(Number),
+        })
+        .from(votes)
+        .where(eq(votes.roundId, roundId))
+        .groupBy(votes.movie);
+
+    // Start from 0 for every movie (stable)
     const counts: Record<string, number> = Object.fromEntries(
         round.movies.map((m) => [m, 0])
     );
 
-    // Count votes for this round
-    for (const v of votes) {
-        if (v.roundId === roundId && typeof counts[v.movie] === "number") {
-            counts[v.movie] += 1;
+    for (const r of rows) {
+        if (typeof counts[r.movie] === "number") {
+            counts[r.movie] = r.count;
         }
     }
 
