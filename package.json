@@ -11,7 +11,9 @@
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.1",
     "next": "16.1.6",
+    "pg": "^8.19.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.1"
@@ -21,6 +23,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.9",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",

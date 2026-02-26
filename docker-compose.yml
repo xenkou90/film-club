@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: filmclub_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: filmclub
+      POSTGRES_PASSWORD: filmclub_password
+      POSTGRES_DB: filmclub
+    volumes:
+      - filmclub_pgdata:/var/lib/postgresql/data
+
+volumes:
+  filmclub_pgdata:
