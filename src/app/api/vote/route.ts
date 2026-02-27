@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { round as roundStore } from "@/lib/store";
-import { votes } from "@/db/schema";
+import { votes, rounds } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-
-// NOTE:
-// We still validate against roundStore for phase + allowed movies (for now)
-// But votes are stored in Postgres
-
 
 type VoteRequestBody = {
     roundId: string;
@@ -61,20 +55,31 @@ export async function POST(req: Request) {
         );
     }
 
-    // Validate against current round (still in-memory for now)
-    if (roundId !== roundStore.id) {
+    // Validate against the DB round row (NOT in-memory)
+    const roundRows = await db
+        .select()
+        .from(rounds)
+        .where(eq(rounds.id, roundId))
+        .limit(1);
+
+    const r = roundRows[0];
+
+    if (!r) {
         return NextResponse.json({ error: "Unknown round" }, { status: 404 });
     }
 
-    if (roundStore.phase !== "voting") {
+    // Use DB phase
+    if (r.phase !== "voting") {
         return NextResponse.json({ error: "Voting is not open" }, { status: 403 });
     }
 
-    if (!roundStore.movies.includes(movie)) {
+    // Use DB movies list
+    const movies = (r.movies ?? []) as string[];
+    if (!movies.includes(movie)) {
         return NextResponse.json({ error: "Invalid movie" }, { status: 400 });
     }
 
-    // DB upsert: one vote per (roundId, userId)
+    // DB upsert stays the same: one vote per (roundId, userId)
     const updatedAt = new Date();
 
     const result = await db

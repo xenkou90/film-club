@@ -1,5 +1,7 @@
 import  { NextResponse } from "next/server";
-import { round, setRoundPhase } from "@/lib/store";
+import { db } from "@/db";
+import { rounds } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import type { Phase } from "@/lib/types";
 
 type Body = {
@@ -29,7 +31,13 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid phase" }, { status: 400 });
     }
 
-    setRoundPhase(phase);
+    const currentId = process.env.CURRENT_ROUND_ID ?? "may-2026";
 
-    return NextResponse.json({ ok: true, round });
+    await db
+        .update(rounds)
+        .set({ phase, updatedAt: new Date() })
+        .where(eq(rounds.id, currentId));
+
+    const [updated] = await db.select().from(rounds).where(eq(rounds.id, currentId));
+    return NextResponse.json({ ok: true, rounds: updated });
 }

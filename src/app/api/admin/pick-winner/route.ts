@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { round, pickWinnerForRound } from "@/lib/store";
 import { db } from "@/db";
-import { votes } from "@/db/schema";
+import { rounds, votes } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 type Body = {
@@ -25,43 +24,56 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Unauthorized" }, {status: 401 });
     }
 
-    const roundId = body.roundId ?? "";
+    // Canonical round id comes from env (single source of truth)
+    const currentId = process.env.CURRENT_ROUND_ID ?? "may-2026";
 
-    if (!roundId) {
-        return NextResponse.json({ error: "roundId is required" }, { status: 400 });
-    }
+    // Fetch the round row from DB
+    const roundRows = await db
+        .select()
+        .from(rounds)
+        .where(eq(rounds.id, currentId))
+        .limit(1);
 
-    if (roundId !== round.id) {
-        return NextResponse.json({ error: "Unknown round" }, { status: 404 });
-    }
+    const r = roundRows[0];
 
-    // Optional guard: you usually pick a winner only after voting closes
-    if (round.phase !== "closed") {
+    if (!r) {
         return NextResponse.json(
-            { error: "You can only pick a winner when phase is closed" },
+            { error: "No current round found", currentId },
+            { status: 404 }
+        );
+    }
+
+    // Optional guard: only pick winner after voting closes (from DB)
+    if (r.phase !== "closed") {
+        return NextResponse.json(
+            { error: "You can only pick a winner when phase is closed", phase: r.phase },
             { status: 403 }
         );
     }
 
+    // Count votes from DB
     const rows = await db
         .select({
             movie: votes.movie,
             count: sql<number>`count(*)`.mapWith(Number),
         })
         .from(votes)
-        .where(eq(votes.roundId, roundId))
+        .where(eq(votes.roundId, currentId))
         .groupBy(votes.movie);
 
+    // Build zeroed counts from DB movies
     const counts: Record<string, number> = Object.fromEntries(
-        round.movies.map((m) => [m, 0])
+        (r.movies ?? []).map((m) => [m, 0])
     );
 
-    for (const r of rows) {
-        if (typeof counts[r.movie] === "number") {
-            counts[r.movie] = r.count;
+    // Fill counts from actual vote rows
+    for (const row of rows) {
+        if (typeof counts[row.movie] === "number") {
+            counts[row.movie] = row.count;
         }
     }
 
+    // Determine winner
     const maxVotes = Math.max(...Object.values(counts));
     const tied = Object.entries(counts)
         .filter(([, c]) => c === maxVotes)
@@ -77,7 +89,21 @@ export async function POST(req: Request) {
     const winner =
         tied.length === 1 ? tied[0] : tied[Math.floor(Math.random() * tied.length)];
 
-    round.winnerMovie = winner;
+    // Persist winner to DB (and optionally advance phase)
+    await db
+        .update(rounds)
+        .set({
+            winnerMovie: winner,
+            updatedAt: new Date(),
+        })
+        .where(eq(rounds.id, currentId));
 
-    return NextResponse.json({ ok: true, winner, tied, counts, round });
+    // Return shape UI expects
+    return NextResponse.json({
+        ok: true,
+        roundId: currentId,
+        winner,
+        tied,
+        counts,
+    });
 }

@@ -1,5 +1,7 @@
 import {NextResponse } from "next/server";
-import { round, setMeetingDetails } from "@/lib/store";
+import { db } from "@/db";
+import { rounds } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 type Body = {
     key?: string;
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
     const providedKey = body.key ?? "";
 
     if (!expectedKey || providedKey !== expectedKey) {
-        return NextResponse.json({ error: "Unauthorizes" }, { status: 401 });
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const roundId = body.roundId ?? "";
@@ -32,10 +34,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "roundId is required" }, { status: 400 });
     }
 
-    if (roundId !== round.id) {
-        return NextResponse.json({ error: "Unknown round" }, { status: 404 });
-    }
-
     if (!dateText || !placeText) {
         return NextResponse.json(
             { error: "dateText and placeText are required" },
@@ -43,7 +41,39 @@ export async function POST(req: Request) {
         );
     }
 
-    setMeetingDetails(dateText, placeText);
+    const currentId = process.env.CURRENT_ROUND_ID ?? "may-2026";
 
-    return NextResponse.json({ ok: true, meeting: round.meeting, round });
+    if (roundId !== currentId) {
+        return NextResponse.json({ error: "Unknown round" }, { status: 404 });
+    }
+
+    await db
+        .update(rounds)
+        .set({
+            meetingDateText: dateText,
+            meetingPlaceText: placeText,
+            updatedAt: new Date(),
+        })
+        .where(eq(rounds.id, currentId));
+
+    const [updatedRound] = await db
+        .select()
+        .from(rounds)
+        .where(eq(rounds.id, currentId));
+
+    if (!updatedRound) {
+        return NextResponse.json(
+            { error: "Round not found after update" },
+            { status: 500 }
+        );
+    }
+
+    return NextResponse.json({
+        ok: true,
+        round: updatedRound,
+        meeting: {
+            dateText: updatedRound.meetingDateText,
+            placeText: updatedRound.meetingPlaceText,
+        },
+    });
 }
