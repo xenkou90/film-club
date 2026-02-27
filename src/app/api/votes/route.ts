@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { votes } from "@/db/schema";
-import { round } from "@/lib/store";
+import { rounds, votes } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 export async function GET(req: Request) {
@@ -12,11 +11,22 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "roundId is required" }, { status: 400 });
     }
 
-    if (roundId !== round.id) {
+    // Load round from DB so we know the official movie list
+    const roundRows = await db
+        .select({ id: rounds.id, movies: rounds.movies })
+        .from(rounds)
+        .where(eq(rounds.id, roundId))
+        .limit(1);
+
+    const r = roundRows[0];
+
+    if (!r) {
         return NextResponse.json({ error: "Unknown round" }, { status: 404 });
     }
 
-    // DB counts by movie
+    const movies = (r.movies ??[]) as string[];
+
+    // Count votes grouped by movie for this round
     const rows = await db
         .select({
             movie: votes.movie,
@@ -26,14 +36,15 @@ export async function GET(req: Request) {
         .where(eq(votes.roundId, roundId))
         .groupBy(votes.movie);
 
-    // Start from 0 for every movie (stable)
+    // Start with 0 for every movie (stable ordering / includes zeros)
     const counts: Record<string, number> = Object.fromEntries(
-        round.movies.map((m) => [m, 0])
+        movies.map((m) => [m, 0])
     );
 
-    for (const r of rows) {
-        if (typeof counts[r.movie] === "number") {
-            counts[r.movie] = r.count;
+    // Fill counts from DB results
+    for (const row of rows) {
+        if (typeof counts[row.movie] === "number") {
+            counts[row.movie] = row.count;
         }
     }
 
