@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
-import { round, getUserRSVP, upsertRSVP } from "@/lib/store";
-import type { RSVPStatus } from "@/lib/store";
+import { db } from "@/db";
+import { rsvps } from "@/db/schema";
+import { round } from "@/lib/store";
+import { and, eq } from "drizzle-orm";
+
+type RSVPStatus = "yes" | "no";
 
 type RSVPRequestBody = {
     roundId: string;
@@ -21,9 +25,18 @@ export async function GET(req: Request) {
         );
     }
 
-    const rsvp = getUserRSVP(roundId, userId);
+    const row = await db
+        .select({
+            roundId: rsvps.roundId,
+            userId: rsvps.userId,
+            status: rsvps.status,
+            updatedAt: rsvps.updatedAt,
+        })
+        .from(rsvps)
+        .where(and(eq(rsvps.roundId, roundId), eq(rsvps.userId, userId)))
+        .limit(1);
 
-    return NextResponse.json({ ok: true, rsvp });
+    return NextResponse.json({ ok: true, rsvp: row[0] ?? null });
 }
 
 export async function POST(req: Request) {
@@ -32,14 +45,14 @@ export async function POST(req: Request) {
     try {
         body = await req.json();
     } catch {
-        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+        return NextResponse.json({ error: "Invalida JSON body" }, { status: 400 });
     }
 
     const { roundId, userId, status } = body;
 
     if (!roundId || !userId || !status) {
         return NextResponse.json(
-            { error: "roundId, userId and status are required"},
+            { error: "roundId, userId and status are required" },
             { status: 400 }
         );
     }
@@ -48,7 +61,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Unknown round" }, { status: 404 });
     }
 
-    // Rule: RSVP only when winner is announced
     if (round.phase !== "winner") {
         return NextResponse.json(
             { error: "RSVP is only available after the winner is announced" },
@@ -56,11 +68,29 @@ export async function POST(req: Request) {
         );
     }
 
-    if (status !== "yes" && status !== "no") {
-        return NextResponse.json({ error: "invalid status" }, { status: 400 });
+    if (status !== "yes" && status !== "no"){
+        return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const rsvp = upsertRSVP(roundId, userId, status);
+    const updatedAt = new Date();
 
-    return NextResponse.json({ ok: true, rsvp });
+    const result = await db
+        .insert(rsvps)
+        .values({
+            roundId,
+            userId,
+            status,
+        })
+        .onConflictDoUpdate({
+            target: [rsvps.roundId, rsvps.userId],
+            set: { status, updatedAt },
+        })
+        .returning({
+            roundId: rsvps.roundId,
+            userId: rsvps.userId,
+            status: rsvps.status,
+            updatedAt: rsvps.updatedAt,
+        });
+
+    return NextResponse.json({ ok: true, rsvp: result[0] });
 }
