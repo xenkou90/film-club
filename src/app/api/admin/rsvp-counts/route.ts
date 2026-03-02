@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { rsvps } from "@/db/schema";
-import { round } from "@/lib/store";
+import { rounds, rsvps } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-
     const key = searchParams.get("key") ?? "";
     const roundId = searchParams.get("roundId") ?? "";
 
     const expectedKey = process.env.ADMIN_KEY ?? "";
-
     if (!expectedKey || key !== expectedKey) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -20,7 +17,14 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "roundId is required" }, { status: 400 });
     }
 
-    if (roundId !== round.id) {
+    // Validate roundId against the DB
+    const roundRows = await db
+        .select({ id: rounds.id })
+        .from(rounds)
+        .where(eq(rounds.id, roundId))
+        .limit(1);
+
+    if (!roundRows[0]) {
         return NextResponse.json({ error: "Unknown round" }, { status: 404 });
     }
 
@@ -35,7 +39,6 @@ export async function GET(req: Request) {
 
     let yes = 0;
     let no = 0;
-
     for (const r of rows) {
         if (r.status === "yes") yes = r.count;
         if(r.status === "no") no = r.count;
