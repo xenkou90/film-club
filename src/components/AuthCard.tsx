@@ -138,7 +138,7 @@ export default function AuthCard() {
                     </label>
 
                     <label className="grid gap-2">
-                        <span className="text-xs font-extrabold uppercase tracking-wider">Password</span>
+                        <span className="text-xs font-extrabold uppercase tracking-wider">Confirm Password</span>
                         <input
                             className="brut-input"
                             type="password"
@@ -198,6 +198,7 @@ export default function AuthCard() {
                     
                     <button 
                         type="submit"
+                        className="brut-btn bg-[#b8ff66]"
                         disabled={!registerIsValid}
                         title={!registerIsValid ? "Email must not be empty, password must be at least 8 characters, and passwords must match" : ""}
                     >

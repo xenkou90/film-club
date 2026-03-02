@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     try {
         body = await req.json();
     } catch {
-        return NextResponse.json({ error: "Invalida JSON body" }, { status: 400 });
+        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
     const { roundId, userId, status } = body;
