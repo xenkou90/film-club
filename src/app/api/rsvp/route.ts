@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { rsvps } from "@/db/schema";
-import { round } from "@/lib/store";
+import { rounds, rsvps } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
 type RSVPStatus = "yes" | "no";
@@ -57,11 +56,26 @@ export async function POST(req: Request) {
         );
     }
 
-    if (roundId !== round.id) {
+    // Load round from DB
+    const roundRows = await db
+        .select({
+            id: rounds.id,
+            phase: rounds.phase,
+            winnerMovie: rounds.winnerMovie,
+        })
+        .from(rounds)
+        .where(eq(rounds.id, roundId))
+        .limit(1);
+
+    const r = roundRows[0];
+
+    if (!r) {
         return NextResponse.json({ error: "Unknown round" }, { status: 404 });
     }
 
-    if (round.phase !== "winner") {
+    // Rule: RSVP only when winner is announced
+    // (Check phase and also ensure winnerMovie exists to match the message)
+    if (r.phase !== "winner" || !r.winnerMovie) {
         return NextResponse.json(
             { error: "RSVP is only available after the winner is announced" },
             { status: 403 }
