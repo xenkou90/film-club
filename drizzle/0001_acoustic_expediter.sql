@@ -1,0 +1,1 @@
+ALTER TABLE "rounds" RENAME COLUMN "creatred_at" TO "created_at";
