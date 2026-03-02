@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { rounds, votes } from "@/db/schema";
+import { rounds, votes, rsvps } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 type Body = {
@@ -88,6 +88,20 @@ export async function POST(req: Request) {
 
     const winner =
         tied.length === 1 ? tied[0] : tied[Math.floor(Math.random() * tied.length)];
+
+    // Prevent re-picking winner after RSVPs exist
+    const existingRsvps = await db
+        .select()
+        .from(rsvps)
+        .where(eq(rsvps.roundId, currentId))
+        .limit(1);
+
+    if (existingRsvps.length > 0) {
+        return NextResponse.json(
+            { error: "Cannot change winner after RSVPs have started" },
+            { status: 400 }
+        );
+    }
 
     // Persist winner to DB (and optionally advance phase)
     await db
