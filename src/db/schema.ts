@@ -10,7 +10,7 @@ export const rounds = pgTable("rounds", {
     winnerMovie: text("winner_movie"),
     meetingDateText: text("meeting_date_text"),
     meetingPlaceText: text("meeting_place_text"),
-    createdAt: timestamp("creatred_at").notNull().defaultNow(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
