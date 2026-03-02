@@ -78,17 +78,16 @@ export default function AuthCard() {
 
         <div className="brut-card w-full">
             <div className="flex items-start justify-between gap-4">
-                </div>
-                    <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
-                        Film Club
-                    </p>
-                    <h1 className="mt-2 text-2xl font-extrabold leading-tight">
-                        {mode === "login" ? "Enter the club." : "Join the club."}
-                    </h1>
-                    <p className="mt-2 text-sm opacity-90">
-                        Monthly theme. Five Picks. One winner.
-                    </p>
-                
+                <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                    Film Club
+                </p>
+                <h1 className="mt-2 text-2xl font-extrabold leading-tight">
+                    {mode === "login" ? "Enter the club." : "Join the club."}
+                </h1>
+                <p className="mt-2 text-sm opacity-90">
+                    Monthly theme. Five Picks. One winner.
+                </p>
+            </div>
 
             <div className="flex shrink-0 overflow-hidden rounded-lg border-[3px] border-black">
                 <button
