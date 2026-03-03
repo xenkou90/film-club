@@ -10,6 +10,10 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
     const [meetingDateText, setMeetingDateText] = useState("");
     const [meetingPlaceText, setMeetingPlaceText] = useState("");
     const [rsvpCounts, setRsvpCounts] = useState<{ yes: number; no: number; total: number } | null>(null);
+    const [pendingAction, setPendingAction] = useState<null | {
+        label: string;
+        run: () => void;
+    }>(null);
 
     useEffect(() => {
         (async () => {
@@ -171,8 +175,8 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                 <button
                     type="button"
                     className="brut-btn bg-white"
-                    onClick={() => setPhase("voting")}
-                    disabled={isSubmitting}
+                    onClick={() => setPendingAction({ label: "Set phase to VOTING?", run: () => setPhase("voting") })}
+                    disabled={isSubmitting || !!pendingAction}
                 >
                     Set Phase: Voting
                 </button>
@@ -180,8 +184,8 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                 <button
                     type="button"
                     className="brut-btn bg-white"
-                    onClick={() => setPhase("closed")}
-                    disabled={isSubmitting}
+                    onClick={() => setPendingAction({ label: "Set phase to CLOSED?", run: () => setPhase("closed") })}
+                    disabled={isSubmitting || !!pendingAction}
                 >
                     Set Phase: Closed
                 </button>
@@ -189,8 +193,8 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                 <button
                     type="button"
                     className="brut-btn bg-white"
-                    onClick={pickWinner}
-                    disabled={isSubmitting || !roundId}
+                    onClick={() => setPendingAction({ label: "Pick winner now?", run: pickWinner })}
+                    disabled={isSubmitting || !roundId || !!pendingAction}
                     title={!roundId ? "Loading round..." : ""}
                 >
                     Pick winner (tie → shuffle)
@@ -199,11 +203,38 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                 <button
                     type="button"
                     className="brut-btn bg-white"
-                    onClick={() => setPhase("winner")}
-                    disabled={isSubmitting}
+                    onClick={() => setPendingAction({ label: "Set phase to WINNER?", run: () => setPhase("winner") })}
+                    disabled={isSubmitting || !!pendingAction}
                 >
-                    Set Phase: Winner
+                    Set phase: Winner
                 </button>
+
+                {pendingAction && (
+                    <div className="border-[3px] border-black rounded-xl p-4 bg-[#fff7cc] grid gap-3">
+                        <p className="font-extrabold">{pendingAction.label}</p>
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                className="brut-btn bg-[#1f046e] text-white flex-1"
+                                onClick={() => {
+                                    pendingAction.run();
+                                    setPendingAction(null);
+                                }}
+                                disabled={isSubmitting}
+                            >
+                                Confirm
+                            </button>
+                            <button
+                                type="button"
+                                className="brut-btn bg-white flex-1"
+                                onClick={() => setPendingAction(null)}
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="mt-6 grid gap-3">
