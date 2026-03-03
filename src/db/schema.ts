@@ -42,3 +42,18 @@ export const rsvps = pgTable(
         uniqRSVPPerUser: uniqueIndex("rsvps_round_user_unique").on(t.roundId, t.userId),
     })
 );
+
+export const users = pgTable("users", {
+    id: text("id").primaryKey(), // Use crypto.randomUUID()
+    email: text("email").notNull().unique(),
+    passwordHash: text("password_hash").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const invites = pgTable("invites", {
+    id: serial("id").primaryKey(),
+    token: text("token").notNull().unique(), // the value in the invite URL
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    usedAt: timestamp("used_at"),  // null = not yet used
+    usedBy: text("used_by"),  // email of who registered with it
+});
