@@ -355,7 +355,7 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                         label: "Generate a new invite link?",
                         run: generateInvite,
                     })}
-                    disabled={isSubmitting || !pendingAction}
+                    disabled={isSubmitting || !!pendingAction}
                 >
                     Generate invite link
                 </button>
