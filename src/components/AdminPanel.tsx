@@ -14,6 +14,8 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
         label: string;
         run: () => void;
     }>(null);
+    const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -153,6 +155,40 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
         } finally {
             setIsSubmitting(false);
         }
+    }
+
+    async function generateInvite() {
+        setIsSubmitting(true);
+        setStatus(null);
+        setInviteUrl(null);
+
+        try {
+            const res = await fetch("/api/admin/invite", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key: adminKey }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setStatus(data?.error ?? "Failed to generater invite");
+                return;
+            }
+
+            setInviteUrl(data.inviteUrl);
+        } catch {
+            setStatus("Network error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    async function copyInviteUrl() {
+        if (!inviteUrl) return;
+        await navigator.clipboard.writeText(inviteUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     }
 
     return (
@@ -302,6 +338,49 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
             <p className="mt-4 text-xs opacity-80">
                 Open /round in another tab and watch it update after refresh.
             </p>
+
+            <div className="mt-6 border-[3px] border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                    Invite a member
+                </p>
+
+                <p className="mt-2 text-sm font-bold opacity-80">
+                    Generate a single-use invite link. Send it to one friend.
+                </p>
+
+                <button
+                    type="button"
+                    className="mt-3 brut-btn bg-[#b8ff66]"
+                    onClick={() => setPendingAction({
+                        label: "Generate a new invite link?",
+                        run: generateInvite,
+                    })}
+                    disabled={isSubmitting || !pendingAction}
+                >
+                    Generate invite link
+                </button>
+
+                {inviteUrl && (
+                    <div className="mt-4 grid gap-2">
+                        <p className="text-xs font-extrabold uppercase tracking-wider">
+                            Invite link - share once
+                        </p>
+
+                        <p className="break-all rounded-lg border-[3px] border-black px-3 py-2 text-sm font-bold bg-[#f3f0ff]">
+                            {inviteUrl}
+                        </p>
+
+                        <button
+                            type="button"
+                            className="brut-btn bg-[#66d9ff]"
+                            onClick={copyInviteUrl}
+                        >
+                            {copied ? "Copied! ✅" : "Copy link"}
+                        </button>
+                    </div>
+                )}
+            </div>
+
         </div>
     );
 }
