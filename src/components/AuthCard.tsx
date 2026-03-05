@@ -2,20 +2,32 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type Mode = "login" | "register";
 
-export default function AuthCard() {
-    const [mode, setMode] = useState<Mode>("login");
+type AuthCardProps = {
+    defaultMode?: Mode;
+    inviteToken?: string;
+};
+
+export default function AuthCard({
+    defaultMode= "login",
+    inviteToken = "",
+}: AuthCardProps) {
+    const router = useRouter();
+    const [mode, setMode] = useState<Mode>(defaultMode);
 
     const [login, setLogin] = useState({ email: "", password: "" });
-    const [register, setRegister] = useState({
+    const[register, setRegister] = useState({
         email: "",
         password: "",
         confirmPassword: "",
     });
 
     const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         setLogin({ email: "", password: "" });
@@ -31,25 +43,42 @@ export default function AuthCard() {
         setRegister((prev) => ({ ...prev, ...patch }));
     };
 
-    const loginIsValid = login.email.trim() !== "" && login.password.length >= 8;
+    const loginIsValid =
+        login.email.trim() !== "" && login.password.length >= 8;
 
     const registerIsValid =
         register.email.trim() !== "" &&
         register.password.length >= 8 &&
         register.confirmPassword.length >= 8 &&
-        register.password === register.confirmPassword; 
+        register.password === register.confirmPassword;
 
-    const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
-
         setError(null);
+        setIsSubmitting(true);
 
-        console.log("Submitting login:");
-        console.log("Email:", login.email);
-        console.log("Password:", login.password);
+        try {
+            const result = await signIn("credentials", {
+                email: login.email.toLowerCase().trim(),
+                password: login.password,
+                redirect: false, // I handle the redirect myself
+            });
+
+            if (result?.error) {
+                setError("Invalid email or password");
+                return;
+            }
+
+            // Succesful login - go to round page
+            router.push("/round");
+        } catch {
+            setError("Something went wrong. Try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const handleRegisterSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    const handleRegisterSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
 
         if (register.password !== register.confirmPassword) {
@@ -57,16 +86,56 @@ export default function AuthCard() {
             return;
         }
 
-        setError(null);
+        if (!inviteToken) {
+            setError("Missing invite token. Use the invite link sent to you.");
+            return;
+        }
 
-        console.log("Submitting register:");
-        console.log("Email:", register.email);
-        console.log("Password:", register.password);
+        setError(null);
+        setIsSubmitting(true);
+
+        try {
+            // Step 1: Create the account
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: register.email.toLowerCase().trim(),
+                    password: register.password,
+                    token: inviteToken,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data?.error ?? "Registration failed");
+                return;
+            }
+
+            // Step 2: Automatically sign in after registering
+            const result = await signIn("credentials", {
+                email: register.email.toLowerCase().trim(),
+                password: register.password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError("Account created but login failed. Try logging in manually");
+                return;
+            }
+
+            // Step 3: Go to round page
+            router.push("/round");
+        } catch {
+            setError("Something went wrong. Try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <section className="w-full max-w-md flex flex-col items-center gap-4">
-
             <Image
                 src="/logo.png"
                 alt="Film Club Logo"
@@ -74,140 +143,161 @@ export default function AuthCard() {
                 height={2200}
                 className="object-contain"
                 priority
-            /> 
+            />
 
-        <div className="brut-card w-full">
-            <div className="flex items-start justify-between gap-4">
-                <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
-                    Film Club
-                </p>
-                <h1 className="mt-2 text-2xl font-extrabold leading-tight">
-                    {mode === "login" ? "Enter the club." : "Join the club."}
-                </h1>
-                <p className="mt-2 text-sm opacity-90">
-                    Monthly theme. Five Picks. One winner.
-                </p>
-            </div>
+            <div className="brut-card w-full">
+                <div className="flex items-start justify-between gap-4">
+                    <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                        Film Club
+                    </p>
+                    <h1 className="mt-2 text-2xl font-extrabold leading-tight">
+                        {mode === "login" ? "Enter the club." : "Join the club."}
+                    </h1>
+                    <p className="mt-2 text-sm opacity-90">
+                        Monthly theme. Five picks. One winner.
+                    </p>
+                </div>
 
-            <div className="flex shrink-0 overflow-hidden rounded-lg border-[3px] border-black">
-                <button
-                    type="button"
-                    onClick={() => setMode("login")}
-                    className={[
-                        "brut-tab",
-                        mode === "login" ? "bg-[#1f046e] text-white" : "bg-white text-black",
-                    ].join(" ")}
-                    aria-pressed={mode === "login"}
-                >
-                    Login
-                </button>
+                <div className="flex shrink-0 overflow-hidden rounded-lg border-[3px] border-black">
+                    <button
+                        type="button"
+                        onClick={() => setMode("login")}
+                        className={[
+                            "brut-tab",
+                            mode === "login"
+                                ? "bg-[#1f046e] text-white"
+                                : "bg-white text-black",
+                        ].join(" ")}
+                        aria-pressed={mode === "login"}
+                    >
+                        Login
+                    </button>
 
-                <button
-                    type="button"
-                    onClick={() => setMode("register")}
-                    className={[
-                        "brut-tab",
-                        mode === "register" ? "bg-[#1f046e] text-white" : "bg-white text-black",
-                    ].join(" ")}
-                    aria-pressed={mode === "register"}
-                >
-                    Register
-                </button>
-            </div>
+                    <button
+                        type="button"
+                        onClick={() => setMode("register")}
+                        className={[
+                            "brut-tab",
+                            mode === "register"
+                                ? "bg-[#1f046e] text-white"
+                                : "bg-white text-black",
+                        ].join(" ")}
+                        aria-pressed={mode === "register"}
+                    >
+                        Register
+                    </button>
+                </div>
 
-            {error && (
-                <p 
-                    role="alert"
-                    className="mt-4 border-[3px] border-black rounded-xl px-3 py-2 font-bold bg-[#ffd6d6]"
-                >
-                    {error}
-                </p>
+                {error && (
+                    <p
+                        role="alert"
+                        className="mt-4 border-[3px] border-black rounded-xl px-3 py-2 font-bold bg-[#ffd6d6]"
+                    >
+                        {error}
+                    </p>
                 )}
 
-            {mode === "login" && (
-                <form onSubmit={handleLoginSubmit} className="mt-6 grid gap-4">
-                    <label className="grid gap-2">
-                        <span className="text-xs font-extrabold uppercase tracking-wider">Email</span>
-                        <input
-                            className="brut-input"
-                            type="email"
-                            placeholder="you@club.com"
-                            value={login.email}
-                            onChange={(e) => updateLogin({ email: e.target.value })}
-                        />
-                    </label>
+                {mode === "login" && (
+                    <form onSubmit={handleLoginSubmit} className="mt-6 grid gap-4">
+                        <label className="grid gap-2">
+                            <span className="text-xs font-extrabold uppercase tracking-wider">
+                                Email
+                            </span>
+                            <input
+                                className="brut-input"
+                                type="email"
+                                placeholder="you@club.com"
+                                value={login.email}
+                                onChange={(e) => updateLogin({ email: e.target.value })}
+                            />
+                        </label>
 
-                    <label className="grid gap-2">
-                        <span className="text-xs font-extrabold uppercase tracking-wider">Confirm Password</span>
-                        <input
-                            className="brut-input"
-                            type="password"
-                            placeholder="••••••••"
-                            value={login.password}
-                            onChange={(e) => updateLogin({ password: e.target.value })}
-                        />
-                    </label>
+                        <label className="grid gap-2">
+                            <span className="text-xs font-extrabold uppercase tracking-wider">
+                                Password
+                            </span>
+                            <input
+                                className="brut-input"
+                                type="password"
+                                placeholder="••••••••"
+                                value={login.password}
+                                onChange={(e) => updateLogin({ password: e.target.value })}
+                            />
+                        </label>
 
-                    <button 
-                        className="brut-btn bg-[#b8ff66]"
-                        type="submit"
-                        disabled={!loginIsValid}
-                        title={!loginIsValid ? "Email must not be empty and password must be at least 8 characters" : ""}
-                    >
-                        Enter
-                    </button>
+                        <button
+                            className="brut-btn bg-[#b8ff66]"
+                            type="submit"
+                            disabled={!loginIsValid || isSubmitting}
+                            title={
+                                !loginIsValid
+                                    ? "Email must not be empty and password must be at least 8 characters"
+                                    : ""
+                            }
+                        >
+                            {isSubmitting ? "Entering..." : "Enter"}
+                        </button>
+                    </form>
+                )}
 
-                </form>
+                {mode === "register" && (
+                    <form onSubmit={handleRegisterSubmit} className="mt-6 grid gap-4">
+                        <label className="grid gap-2">
+                            <span className="text-xs font-extrabold uppercase tracking-wider">
+                                Email
+                            </span>
+                            <input
+                                className="brut-input"
+                                type="email"
+                                placeholder="you@club.com"
+                                value={register.email}
+                                onChange={(e) => updateRegister({ email: e.target.value })}
+                            />
+                        </label>
 
-            )}
+                        <label className="grid gap-2">
+                            <span className="text-xs font-extrabold uppercase tracking-wider">
+                                Password
+                            </span>
+                            <input
+                                className="brut-input"
+                                type="password"
+                                placeholder="Password"
+                                value={register.password}
+                                onChange={(e) => updateRegister({ password: e.target.value })}
+                            />
+                        </label>
 
-            {mode === "register" && (
-                <form onSubmit={handleRegisterSubmit} className="mt-6 grid gap-4">
-                    <label className="grid gap-2">
-                        <span className="text-xs font-extrabold uppercase tracking-wider">Email</span>
-                        <input
-                            className="brut-input"
-                            type="email"
-                            placeholder="you@club.com"
-                            value={register.email}
-                            onChange={(e) => updateRegister({ email: e.target.value })}
-                        />
-                    </label>
+                        <label className="grid gap-2">
+                            <span className="text-xs font-extrabold uppercase tracking-wider">
+                                Confirm Password
+                            </span>
+                            <input
+                                className="brut-input"
+                                type="password"
+                                placeholder="Confirm Password"
+                                value={register.confirmPassword}
+                                onChange={(e) =>
+                                    updateRegister({ confirmPassword: e.target.value })
+                                }
+                            />
+                        </label>
 
-                    <label className="grid gap-2">
-                        <span className="text-xs font-extrabold uppercase tracking-wider">Password</span>
-                        <input
-                            className="brut-input"
-                            type="password"
-                            placeholder="Password"
-                            value={register.password}
-                            onChange={(e) => updateRegister({ password: e.target.value })}
-                        />
-                    </label>
-                    
-                    <label className="grid gap-2">
-                        <span className="text-xs font-extrabold uppercase tracking-wider">Password</span>
-                        <input
-                            className="brut-input"
-                            type="password"
-                            placeholder="Confirm Password"
-                            value={register.confirmPassword}
-                            onChange={(e) => updateRegister({ confirmPassword: e.target.value })}
-                        />
-                    </label>
-                    
-                    <button 
-                        type="submit"
-                        className="brut-btn bg-[#b8ff66]"
-                        disabled={!registerIsValid}
-                        title={!registerIsValid ? "Email must not be empty, password must be at least 8 characters, and passwords must match" : ""}
-                    >
-                        Create account
-                    </button>
-
-                </form>
-            )}
-        </div>
+                        <button
+                            type="submit"
+                            className="brut-btn bg-[#b8ff66]"
+                            disabled={!registerIsValid || isSubmitting}
+                            title={
+                                !registerIsValid
+                                    ? "Email must not be empty, password must be at least 8 characters, and passwords must match"
+                                    : ""
+                            }
+                        >
+                            {isSubmitting ? "Creating account..." : "Create account"}
+                        </button>
+                    </form>
+                )}
+            </div>
         </section>
-    );
+    )
 }
