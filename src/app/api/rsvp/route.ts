@@ -1,19 +1,12 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { db } from "@/db";
 import { rounds, rsvps } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
-type RSVPStatus = "yes" | "no";
-
-type RSVPRequestBody = {
-    roundId: string;
-    userId: string;
-    status: RSVPStatus;
-};
-
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-
     const roundId = searchParams.get("roundId");
     const userId = searchParams.get("userId");
 
@@ -39,62 +32,56 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    let body: RSVPRequestBody;
+    // Read userId from session - never trust the client for this
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
+    const userId = session.user.email;
+
+    let body: { roundId?: string; status?: string };
     try {
         body = await req.json();
     } catch {
         return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
-    const { roundId, userId, status } = body;
+    const { roundId, status } = body;
 
-    if (!roundId || !userId || !status) {
+    if (!roundId || !status) {
         return NextResponse.json(
-            { error: "roundId, userId and status are required" },
+            { error: "roundId and status are required" },
             { status: 400 }
         );
     }
 
-    // Load round from DB
     const roundRows = await db
-        .select({
-            id: rounds.id,
-            phase: rounds.phase,
-            winnerMovie: rounds.winnerMovie,
-        })
+        .select({ id: rounds.id, phase: rounds.phase, winnerMovie: rounds.winnerMovie })
         .from(rounds)
         .where(eq(rounds.id, roundId))
         .limit(1);
 
     const r = roundRows[0];
-
     if (!r) {
         return NextResponse.json({ error: "Unknown round" }, { status: 404 });
     }
 
-    // Rule: RSVP only when winner is announced
-    // (Check phase and also ensure winnerMovie exists to match the message)
-    if (r.phase !== "winner" || !r.winnerMovie) {
+    if (r.phase !== "winner" || !r.winnerMovie ) {
         return NextResponse.json(
             { error: "RSVP is only available after the winner is announced" },
             { status: 403 }
         );
     }
 
-    if (status !== "yes" && status !== "no"){
+    if (status !== "yes" && status !== "no") {
         return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
     const updatedAt = new Date();
-
     const result = await db
         .insert(rsvps)
-        .values({
-            roundId,
-            userId,
-            status,
-        })
+        .values({ roundId, userId, status })
         .onConflictDoUpdate({
             target: [rsvps.roundId, rsvps.userId],
             set: { status, updatedAt },

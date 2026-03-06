@@ -70,7 +70,6 @@ export default function RoundCard(props: RoundCardProps) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     roundId,
-                    userId,
                     movie: selectedMovie,
                 }),
             });
@@ -127,7 +126,7 @@ export default function RoundCard(props: RoundCardProps) {
             const res = await fetch("/api/rsvp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ roundId, userId, status }),
+                body: JSON.stringify({ roundId, status }),
             });
 
             const data = await res.json();
