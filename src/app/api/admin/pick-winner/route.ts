@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { rounds, votes, rsvps } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { sendWinnerEmail } from "@/lib/email";
 
 type Body = {
     key?: string;
@@ -112,7 +113,23 @@ export async function POST(req: Request) {
         })
         .where(eq(rounds.id, currentId));
 
-    // Return shape UI expects
+    // Fetch updated round to get meeting details for the email
+    const [updatedRound] = await db
+        .select()
+        .from(rounds)
+        .where(eq(rounds.id, currentId));
+
+    const meeting =
+        updatedRound?.meetingDateText && updatedRound?.meetingPlaceText
+            ? {
+                dateText: updatedRound.meetingDateText,
+                placeText: updatedRound.meetingPlaceText,
+              }
+            : undefined;
+
+    // Send winner email - fire and forget
+    sendWinnerEmail(updatedRound.roundTitle, winner, meeting).catch(console.error);
+
     return NextResponse.json({
         ok: true,
         roundId: currentId,
