@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function LogoHeader() {
     return (
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 w-full">
             <Link href="/" aria-label="Go to home">
                 <Image
                     src="/logo.png"
@@ -15,7 +15,7 @@ export default function LogoHeader() {
                 />
             </Link>
 
-            <p className="text-2xl font-black uppercase tracking-widest text-[#1f046e] drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+            <p className="text-2lg font-black uppercase tracking-widest text-black whitespace-nowrap">
                 Monthly theme. Five picks. One winner.
             </p>
         </div>

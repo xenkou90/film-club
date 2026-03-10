@@ -135,11 +135,11 @@ export default function AuthCard({
 
     return (
         <section className="w-full max-w-md">
-            <h1 className="text-2xl font-extrabold leading-tight text-center">
+            <div className="brut-card w-full">
+            <h1 className="mb-4 text-2xl font-extrabold leading-tight text-center">
                 {mode === "login" ? "Enter the club." : "Join the club."}
             </h1>
 
-            <div>
                 <div className="flex shrink-0 overflow-hidden rounded-lg border-[3px] border-black">
                     <button
                         type="button"
@@ -186,7 +186,7 @@ export default function AuthCard({
                                 Email
                             </span>
                             <input
-                                className="brut-input"
+                                className="brut-input placeholder:text-gray-400"
                                 type="email"
                                 placeholder="you@club.com"
                                 value={login.email}
@@ -199,7 +199,7 @@ export default function AuthCard({
                                 Password
                             </span>
                             <input
-                                className="brut-input"
+                                className="brut-input placeholder:text-gray-400"
                                 type="password"
                                 placeholder="••••••••"
                                 value={login.password}
@@ -229,7 +229,7 @@ export default function AuthCard({
                                 Email
                             </span>
                             <input
-                                className="brut-input"
+                                className="brut-input placeholder:text-gray-400"
                                 type="email"
                                 placeholder="you@club.com"
                                 value={register.email}
@@ -242,7 +242,7 @@ export default function AuthCard({
                                 Password
                             </span>
                             <input
-                                className="brut-input"
+                                className="brut-input placeholder:text-gray-400"
                                 type="password"
                                 placeholder="Password"
                                 value={register.password}
@@ -255,7 +255,7 @@ export default function AuthCard({
                                 Confirm Password
                             </span>
                             <input
-                                className="brut-input"
+                                className="brut-input placeholder:text-gray-400"
                                 type="password"
                                 placeholder="Confirm Password"
                                 value={register.confirmPassword}
