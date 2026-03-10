@@ -15,7 +15,7 @@ export default function LogoHeader() {
                 />
             </Link>
 
-            <p className="text-2lg font-black uppercase tracking-widest text-black whitespace-nowrap">
+            <p className="text-base font-black uppercase tracking-widest text-black whitespace-nowrap">
                 Monthly theme. Five picks. One winner.
             </p>
         </div>
