@@ -17,7 +17,7 @@ export default async function Adminpage(props: AdminPageProps) {
 
     if (!allowed) {
         return (
-            <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
+            <main className="min-h-screen bg-[#2e0854] p-5 flex items-center justify-center">
                 <section className="w-full max-w-md">
                     <div className="brut-card w-full">
                         <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
@@ -39,7 +39,7 @@ export default async function Adminpage(props: AdminPageProps) {
     }
 
     return (
-        <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
+        <main className="min-h-screen bg-[#2e0854] p-5 flex items-center justify-center">
             <section className="w-full max-w-md">
                 <AdminPanel adminKey={adminKey} />
             </section>

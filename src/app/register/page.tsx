@@ -11,7 +11,7 @@ export default async function RegisterPage(props: RegisterPageProps) {
     const token = Array.isArray(tokenRaw) ? tokenRaw[0] : tokenRaw ?? "";
 
     return (
-        <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
+        <main className="min-h-screen bg-[#2e0854] p-5 flex items-center justify-center">
             <div className="flex flex-col items-center gap-6 w-full max-w-md">
                 <LogoHeader />
                 <AuthCard defaultMode="register" inviteToken={token} />

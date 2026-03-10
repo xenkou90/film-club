@@ -208,7 +208,7 @@ export default function AuthCard({
                         </label>
 
                         <button
-                            className="brut-btn bg-[#b8ff66]"
+                            className="brut-btn bg-[#4b004b] text-[#b266b2] disabled:bg-[#b266b2] disabled:text-[#2e0854]"
                             type="submit"
                             disabled={!loginIsValid || isSubmitting}
                             title={
@@ -267,7 +267,7 @@ export default function AuthCard({
 
                         <button
                             type="submit"
-                            className="brut-btn bg-[#b8ff66]"
+                            className="brut-btn bg-[#4b004b] text-[#b266b2] disabled:bg-[#b266b2] disabled:text-[#2e0854]"
                             disabled={!registerIsValid || isSubmitting}
                             title={
                                 !registerIsValid

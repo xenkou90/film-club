@@ -85,7 +85,7 @@ export default async function RoundPage() {
     const rsvp = await getUserRSVP(data.id, userId);
 
     return (
-        <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
+        <main className="min-h-screen bg-[#2e0854] p-5 flex items-center justify-center">
             <section className="w-full max-w-md flex flex-col items-center gap-6">
                 <LogoHeader />
                 <PhaseWatcher roundId={data.id} phase={data.phase} />
