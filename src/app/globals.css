@@ -2,7 +2,7 @@
 
 :root {
   --background: #2e0854;
-  --foreground: #b266b2;
+  --foreground: #fbfcfa;
 }
 
 @theme inline {
@@ -22,14 +22,14 @@ body {
   .brut-card {
     @apply border-[3px] border-black rounded-2xl shadow-[8px_8px_0_0_#000] p-5;
     background-color: #800080;
-    color: #b266b2;
+    color: #dda0dd;
   }
   .brut-input {
     @apply w-full border-[3px] rounded-xl px-3 py-3 font-bold outline-none;
     background-color: #2e0854;
     color: #b266b2;
-    border-color: #b266b2;
-    caret-color: #b266b2;
+    border-color: #dda0dd;
+    caret-color: #dda0dd;
   }
   .brut-input:focus {
     box-shadow: 6px 6px 0 0 #000;
@@ -40,7 +40,7 @@ body {
   .brut-input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0px 1000px #dda0dd inset;
     -webkit-text-fill-color: #2e0854;
-    border-color: #b266b2;
+    border-color: #dda0dd;
   }
 
   .brut-btn {

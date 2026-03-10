@@ -147,8 +147,8 @@ export default function AuthCard({
                         className={[
                             "brut-tab rounded-xl",
                             mode === "login"
-                                ? "bg-[#4b004b] text-[#b266b2]"
-                                : "bg-[#2e0854] text-[#b266b2]",
+                                ? "bg-[#4b004b] text-[#dda0dd]"
+                                : "bg-[#2e0854] text-[#dda0dd]",
                         ].join(" ")}
                         aria-pressed={mode === "login"}
                     >
@@ -161,8 +161,8 @@ export default function AuthCard({
                         className={[
                             "brut-tab rounded-xl",
                             mode === "register"
-                                ? "bg-[#4b004b] text-[#b266b2]"
-                                : "bg-[#2e0854] text-[#b266b2]",
+                                ? "bg-[#4b004b] text-[#dda0dd]"
+                                : "bg-[#2e0854] text-[#dda0dd]",
                         ].join(" ")}
                         aria-pressed={mode === "register"}
                     >
@@ -208,7 +208,7 @@ export default function AuthCard({
                         </label>
 
                         <button
-                            className="brut-btn bg-[#4b004b] text-[#b266b2] disabled:bg-[#b266b2] disabled:text-[#2e0854]"
+                            className="brut-btn bg-[#4b004b] text-[#dda0dd] disabled:bg-[#b266b2] disabled:text-[#2e0854]"
                             type="submit"
                             disabled={!loginIsValid || isSubmitting}
                             title={
