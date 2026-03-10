@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -135,29 +134,12 @@ export default function AuthCard({
     };
 
     return (
-        <section className="w-full max-w-md flex flex-col items-center gap-4">
-            <Image
-                src="/logo.png"
-                alt="Film Club Logo"
-                width={2200}
-                height={2200}
-                className="object-contain"
-                priority
-            />
+        <section className="w-full max-w-md">
+            <h1 className="text-2xl font-extrabold leading-tight text-center">
+                {mode === "login" ? "Enter the club." : "Join the club."}
+            </h1>
 
-            <div className="brut-card w-full">
-                <div className="flex items-start justify-between gap-4">
-                    <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
-                        Film Club
-                    </p>
-                    <h1 className="mt-2 text-2xl font-extrabold leading-tight">
-                        {mode === "login" ? "Enter the club." : "Join the club."}
-                    </h1>
-                    <p className="mt-2 text-sm opacity-90">
-                        Monthly theme. Five picks. One winner.
-                    </p>
-                </div>
-
+            <div>
                 <div className="flex shrink-0 overflow-hidden rounded-lg border-[3px] border-black">
                     <button
                         type="button"
@@ -299,5 +281,5 @@ export default function AuthCard({
                 )}
             </div>
         </section>
-    )
+    );
 }

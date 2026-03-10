@@ -5,6 +5,7 @@ import { getSiteUrl } from "@/lib/site-url";
 import RoundCard from "@/components/RoundCard";
 import type { Phase } from "@/lib/types";
 import PhaseWatcher from "@/components/PhaseWatcher";
+import LogoHeader from "@/components/LogoHeader";
 
 type VoteCounts = Record<string, number>;
 
@@ -85,7 +86,8 @@ export default async function RoundPage() {
 
     return (
         <main className="min-h-screen bg-[#a78bfa] p-5 flex items-center justify-center">
-            <section className="w-full max-w-md">
+            <section className="w-full max-w-md flex flex-col items-center gap-6">
+                <LogoHeader />
                 <PhaseWatcher roundId={data.id} phase={data.phase} />
                 <RoundCard
                     initialVoteMovie={vote?.movie ?? null}
