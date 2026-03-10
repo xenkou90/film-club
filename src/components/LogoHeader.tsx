@@ -15,9 +15,11 @@ export default function LogoHeader() {
                 />
             </Link>
 
-            <p className="text-base font-black uppercase tracking-widest text-black whitespace-nowrap">
+        <div style={{ backgroundColor: '#800080', border: '3px solid black', borderRadius: '12px', boxShadow: '6px 6px 0 0  #000', padding: '8px 20px' }}>
+            <p className="text-base font-black upprcase tracking-widest text-[#b266b2] whitespace-nowrap">
                 Monthly theme. Five picks. One winner.
             </p>
+        </div>
         </div>
     );
 }

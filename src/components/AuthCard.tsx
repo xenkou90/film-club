@@ -140,15 +140,15 @@ export default function AuthCard({
                 {mode === "login" ? "Enter the club." : "Join the club."}
             </h1>
 
-                <div className="flex shrink-0 overflow-hidden rounded-lg border-[3px] border-black">
+                <div className="flex justify-center gap-3">
                     <button
                         type="button"
                         onClick={() => setMode("login")}
                         className={[
-                            "brut-tab",
+                            "brut-tab rounded-xl",
                             mode === "login"
-                                ? "bg-[#1f046e] text-white"
-                                : "bg-white text-black",
+                                ? "bg-[#4b004b] text-[#b266b2]"
+                                : "bg-[#2e0854] text-[#b266b2]",
                         ].join(" ")}
                         aria-pressed={mode === "login"}
                     >
@@ -159,10 +159,10 @@ export default function AuthCard({
                         type="button"
                         onClick={() => setMode("register")}
                         className={[
-                            "brut-tab",
+                            "brut-tab rounded-xl",
                             mode === "register"
-                                ? "bg-[#1f046e] text-white"
-                                : "bg-white text-black",
+                                ? "bg-[#4b004b] text-[#b266b2]"
+                                : "bg-[#2e0854] text-[#b266b2]",
                         ].join(" ")}
                         aria-pressed={mode === "register"}
                     >
