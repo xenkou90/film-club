@@ -6,6 +6,7 @@ import RoundCard from "@/components/RoundCard";
 import type { Phase } from "@/lib/types";
 import PhaseWatcher from "@/components/PhaseWatcher";
 import LogoHeader from "@/components/LogoHeader";
+import LogoutButton from "@/components/LogoutButton";
 
 type VoteCounts = Record<string, number>;
 
@@ -103,6 +104,7 @@ export default async function RoundPage() {
                     voteCounts={voteCounts}
                     initialRSVP={rsvp?.status ?? null}
                 />
+                <LogoutButton />
             </section>
         </main>
     );
