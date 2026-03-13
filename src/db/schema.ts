@@ -58,7 +58,7 @@ export const invites = pgTable("invites", {
     usedBy: text("used_by"),  // email of who registered with it
 });
 
-export const settings = pgTable("setting", {
+export const settings = pgTable("settings", {
     key: text("key").primaryKey(),
     value: text("value").notNull(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
