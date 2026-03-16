@@ -33,11 +33,11 @@ type RSVP = {
     updatedAt: string;
 };
 
-async function getRoundData(): Promise<RoundData> {
+async function getRoundData(): Promise<RoundData | null> {
     const res = await fetch(`${getSiteUrl()}/api/round`, {
         cache: "no-store",
     });
-    if (!res.ok) throw new Error("Failed to fetch round data");
+    if (!res.ok) return null;
     return res.json();
 }
 
@@ -72,7 +72,6 @@ async function getUserRSVP(roundId: string, userId: string): Promise<RSVP | null
 }
 
 export default async function RoundPage() {
-    // Get the session - if not logged in, redirect to home
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
         redirect("/");
@@ -81,6 +80,29 @@ export default async function RoundPage() {
     const userId = session.user.email;
 
     const data = await getRoundData();
+
+    // No active round - show a friendly screen instead of crashing
+    if (!data) {
+        return (
+            <main className="min-h-screen bg-[#2e0854] p-5 flex items-center justify-center">
+                <section className="w-full max-w-md flex flex-col items-center gap-6">
+                    <LogoHeader />
+                    <div className="brut-card w-full">
+                        <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                            Film Club
+                        </p>
+                        <h1 className="mt-2 text-2xl font-extrabold leading-tight">
+                            No active round.
+                        </h1>
+                        <p className="mt-3 font-bold">
+                            The next round hasn't started yet. Check back soon.
+                        </p>
+                    </div>
+                </section>
+            </main>
+        );
+    }
+
     const vote = await getUserVote(data.id, userId);
     const voteCounts = await getVoteCounts(data.id);
     const rsvp = await getUserRSVP(data.id, userId);
