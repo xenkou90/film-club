@@ -15,8 +15,8 @@ export default function LogoHeader() {
                 />
             </Link>
 
-        <div style={{ backgroundColor: '#800080', border: '3px solid black', borderRadius: '12px', boxShadow: '6px 6px 0 0  #000', padding: '8px 20px' }}>
-            <p className="text-base font-black upprcase tracking-widest text-[#dda0dd] whitespace-nowrap">
+        <div className="w-full" style={{ backgroundColor: '#800080', border: '3px solid black', borderRadius: '12px', boxShadow: '6px 6px 0 0  #000', padding: '8px 20px' }}>
+            <p className="text-xs sm:text-sm font-black tracking-widest text-[#dda0dd] text-center">
                 Monthly theme. Five picks. One winner.
             </p>
         </div>
