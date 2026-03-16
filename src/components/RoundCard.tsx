@@ -209,7 +209,7 @@ export default function RoundCard(props: RoundCardProps) {
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button
-                                    className="brut-btn bg-[#b8ff66]"
+                                    className="brut-btn bg-[#b8ff66] mt-4"
                                     disabled={!selectedMovie || submitted}
                                     title={
                                         !selectedMovie
@@ -273,9 +273,6 @@ export default function RoundCard(props: RoundCardProps) {
                             </div>
                         )}
                         
-                        <p className="mt-4 text-xs text-center opacity-80">
-                            You can vote once. Voting closes on Day 6.
-                        </p>
                     </>
                 )}
 
