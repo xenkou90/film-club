@@ -23,6 +23,15 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
         themeName: "",
         movies: ["", "", "", "", ""],
     });
+    const [panelData, setPanelData] = useState<{
+        round: {
+            id: string;
+            roundTitle: string;
+            phase: string;
+            voteCounts: Record<string, number>;
+        } | null;
+        members: string[];
+    } | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -34,6 +43,11 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                 setRoundId(null);
             }
         })();
+
+        // Load panel data on mount
+        refreshPanelData();
+     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -262,6 +276,26 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
             movies[index] = value;
             return { ...prev, movies };
         });
+    }
+
+    async function refreshPanelData() {
+        try {
+            const res = await fetch(
+                `/api/admin/panel-data?key=${encodeURIComponent(adminKey)}`,
+                { cache: "no-store" }
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setStatus(data?.error ?? "Failed to load panel data");
+                return;
+            }
+
+            setPanelData(data);
+        } catch {
+            setStatus("Network error loading panel data");
+        }
     }
 
     return (
@@ -540,6 +574,67 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                         Create round
                     </button>
                 </div>
+            </div>
+
+            {/* Current Round Info */}
+            <div className="mt-6 border-[3px] border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                    Current Round
+                </p>
+
+                {panelData?.round ? (
+                    <div className="mt-2 grid gap-2">
+                        <p className="font-extrabold">{panelData.round.roundTitle}</p>
+                        <p className="text-sm font-bold">
+                            Phase: <span className="uppercase">{panelData.round.phase}</span>
+                        </p>
+                        <p className="text-xs font-extrabold uppercase tracking-wider mt-2">
+                            Vote counts
+                        </p>
+                        {Object.entries(panelData.round.voteCounts).map(([movie, count]) => (
+                            <div
+                                key={movie}
+                                className="flex justify-between items-center border-[2px] border-black rounded-lg px-3 py-2"
+                            >
+                                <span className="font-bold text-sm">{movie}</span>
+                                <span className="font-extrabold text-sm">{count}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="mt-2 font-bold opacity-80">No active round.</p>
+                )}
+
+                <button
+                    type="button"
+                    className="mt-4 brut-btn bg-[#66d9ff]"
+                    onClick={refreshPanelData}
+                    disabled={isSubmitting}
+                >
+                    Refresh
+                </button>
+            </div>
+
+            {/* Members List */}
+            <div className="mt-6 border-[3px] border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
+                    Members ({panelData?.members.length ?? 0})
+                </p>
+
+                {panelData?.members && panelData.members.length > 0 ? (
+                    <div className="mt-2 grid gap-2">
+                        {panelData.members.map((email) => (
+                            <div
+                                key={email}
+                                className="border-[2px] border-black rounded-lg px-3 py-2"
+                            >
+                                <p className="font-bold text-sm">{email}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="mt-2 font-bold opacity-80">No members yet.</p>
+                )}
             </div>
         </div>
     );
