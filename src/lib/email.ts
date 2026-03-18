@@ -92,3 +92,23 @@ export async function sendWinnerEmail(
         `,
     });
 }
+
+export async function sendWelcomeEmail(email: string) {
+    await resend.emails.send({
+        from: "Film Club <onboarding@resend.dev>",
+        to: email,
+        subject: "Welcome to Film Club 🎬",
+        html: `
+            <div style="font-family: monospace; max-width: 480px; margin: 0 auto; padding: 24px; border: 3px; solid black;">
+                <h1 style="font-size: 24px; font-weight: 900; margin: 0 0 12px;">You're in.</h1>
+                <p style="margin: 0 0 24px; font-weight: bold;">Welcome to Film Club. Every month we pick a theme, vote on five films and watch the winner together.</p>
+                <a 
+                    href="${process.env.NEXT_PUBLIC_SITE_URL}/round"
+                    style="display: inline-block; background: #b8ff66; border: 3px solid black; padding: 12px 24px; font-weight: 900; text-decoration: none; color: black;"
+                >
+                    Go to Film Club →
+                </a>
+            </div>
+        `,
+    });
+}

@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { users, invites } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { sendWelcomeEmail } from "@/lib/email";
 
 type Body = {
     email?: string;
@@ -94,6 +95,9 @@ export async function POST(req: Request) {
             usedBy: email,
         })
         .where(eq(invites.token, token));
+
+    // Send welcome email - fire and forget
+    sendWelcomeEmail(email).catch(console.error);
 
     return NextResponse.json({ ok: true });
 }
