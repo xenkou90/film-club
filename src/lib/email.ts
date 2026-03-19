@@ -15,7 +15,7 @@ export async function sendVotingOpenEmail(roundTitle: string) {
     if (emails.length === 0) return;
 
     await resend.emails.send({
-        from: "Film Club <onboarding@resend.dev>",
+        from: "Film Club <hello@contact.filmclub.space>",
         to: emails,
         subject: `🎬 Voting is open — ${roundTitle}`,
         html: `
@@ -39,7 +39,7 @@ export async function sendVotingClosedEmail(roundTitle: string) {
     if (emails.length === 0) return;
 
     await resend.emails.send({
-        from: "Film Club <onboarding@resend.dev>",
+        from: "Film Club <hello@contact.filmclub.space>",
         to: emails,
         subject: `🔒 Voting closed — ${roundTitle}`,
         html: `
@@ -71,7 +71,7 @@ export async function sendWinnerEmail(
         : `<p style="margin: 24px 0; font-weight: bold;">Meeting details coming soon.</p>`;
     
     await resend.emails.send({
-        from: "Film Club <onboarding@resend.dev>",
+        from: "Film Club <hello@contact.filmclub.space>",
         to: emails,
         subject: `🏆 Winner: ${winnerMovie} — ${roundTitle}`,
         html: `
@@ -95,7 +95,7 @@ export async function sendWinnerEmail(
 
 export async function sendWelcomeEmail(email: string) {
     await resend.emails.send({
-        from: "Film Club <onboarding@resend.dev>",
+        from: "Film Club <hello@contact.filmclub.space>",
         to: email,
         subject: "Welcome to Film Club 🎬",
         html: `
