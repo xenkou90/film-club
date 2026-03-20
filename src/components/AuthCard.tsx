@@ -47,13 +47,19 @@ export default function AuthCard({
         setRegister((prev) => ({ ...prev, ...patch }));
     };
 
+    function isValidPassword(password: string): boolean {
+        if (password.length < 8) return false;
+        if (!/\d/.test(password)) return false;
+        return true;
+    }
+
     const loginIsValid =
         login.email.trim() !== "" && login.password.length >= 8;
 
     const registerIsValid =
         register.email.trim() !== "" &&
-        register.password.length >= 8 &&
-        register.confirmPassword.length >= 8 &&
+        isValidPassword(register.password) &&
+        isValidPassword(register.confirmPassword) &&
         register.password === register.confirmPassword;
 
     const handleLoginSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
@@ -306,7 +312,7 @@ export default function AuthCard({
                             disabled={!registerIsValid || isSubmitting}
                             title={
                                 !registerIsValid
-                                    ? "Email must not be empty, password must be at least 8 characters, and passwords must match"
+                                    ? "Email must not be empty, password must be at least 8 characters, contain at least one number and passwords must match"
                                     : ""
                             }
                         >

@@ -38,6 +38,13 @@ export async function POST(req: Request) {
         );
     }
 
+    if (!/\d/.test(password)) {
+        return NextResponse.json(
+            { error: "Password must contain at least one number" },
+            { status: 400 }
+        );
+    }
+
     // Check invite token exists and hasn't been used
     const inviteRows = await db
         .select()
