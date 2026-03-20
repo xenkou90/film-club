@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 type Mode = "login" | "register";
 
@@ -27,6 +28,10 @@ export default function AuthCard({
 
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
+    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         setLogin({ email: "", password: "" });
@@ -198,13 +203,23 @@ export default function AuthCard({
                             <span className="text-xs font-extrabold uppercase tracking-wider">
                                 Password
                             </span>
-                            <input
-                                className="brut-input placeholder:text-gray-400"
-                                type="password"
-                                placeholder="••••••••"
-                                value={login.password}
-                                onChange={(e) => updateLogin({ password: e.target.value })}
-                            />
+                            <div className="relative">
+                                <input
+                                    className="brut-input pr-12"
+                                    type={showLoginPassword ? "text" : "password"}
+                                    placeholder="••••••••"
+                                    value={login.password}
+                                    onChange={(e) => updateLogin({ password: e.target.value })}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#fbfcfa] opacity-70 hover:opacity-100"
+                                    onClick={() => setShowLoginPassword((prev) => !prev)}
+                                    tabIndex={-1}
+                                >
+                                    {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </label>
 
                         <button
@@ -241,28 +256,48 @@ export default function AuthCard({
                             <span className="text-xs font-extrabold uppercase tracking-wider">
                                 Password
                             </span>
-                            <input
-                                className="brut-input placeholder:text-gray-400"
-                                type="password"
-                                placeholder="Password"
-                                value={register.password}
-                                onChange={(e) => updateRegister({ password: e.target.value })}
-                            />
+                            <div className="relative">
+                                <input
+                                    className="brut-input pr-12"
+                                    type={showRegisterPassword ? "text" : "password"}
+                                    placeholder="Password"
+                                    value={register.password}
+                                    onChange={(e) => updateRegister({ password: e.target.value })}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#fbfcfa] opacity-70 hover:opacity-100"
+                                    onClick={() => setShowRegisterPassword((prev) => !prev)}
+                                    tabIndex={-1}
+                                >
+                                    {showRegisterPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </label>
 
                         <label className="grid gap-2">
                             <span className="text-xs font-extrabold uppercase tracking-wider">
                                 Confirm Password
                             </span>
-                            <input
-                                className="brut-input placeholder:text-gray-400"
-                                type="password"
-                                placeholder="Confirm Password"
-                                value={register.confirmPassword}
-                                onChange={(e) =>
-                                    updateRegister({ confirmPassword: e.target.value })
-                                }
-                            />
+                            <div className="relative">
+                                <input
+                                    className="brut-input pr-12"
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    placeholder="Confirm Password"
+                                    value={register.confirmPassword}
+                                    onChange={(e) =>
+                                        updateRegister({ confirmPassword: e.target.value })
+                                    }
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#fbfcfa] opacity-70 hover:opacity-100"
+                                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                    tabIndex={-1}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </label>
 
                         <button
