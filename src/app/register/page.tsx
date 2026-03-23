@@ -15,6 +15,10 @@ export default async function RegisterPage(props: RegisterPageProps) {
             <div className="flex flex-col items-center gap-3 w-full max-w-md">
                 <LogoHeader />
                 <AuthCard defaultMode="register" inviteToken={token} />
+
+                <p className="text-xs font-bold tracking-widest text-[#dda0dd] opacity-60">
+                    Imagined, Created, Designed by Xeno
+                </p>
             </div>
         </main>
     );
