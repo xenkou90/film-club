@@ -442,10 +442,6 @@ export default function AdminPanel({ adminKey }: { adminKey: string }) {
                 </button>
             </div>
 
-            <p className="mt-4 text-xs opacity-80">
-                Open /round in another tab and watch it update after refresh.
-            </p>
-
             <div className="mt-6 border-[3px] border-black rounded-xl p-4 bg-white">
                 <p className="text-xs font-extrabold tracking-widest uppercase opacity-80">
                     Invite a member
