@@ -16,7 +16,7 @@ export default function LogoHeader() {
                     alt="Film Club Logo"
                     width={2200}
                     height={2200}
-                    className="object-contain w-48 sm:w-64"
+                    className="object-contain w-[320px] sm:w-[420px]"
                     priority
                 />
             </Link>
