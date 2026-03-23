@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Film Club
 
-## Getting Started
+A private, invite-only web app for running a monthly film club with friends. Every month the admin sets a theme, members vote on five picks, and the winner is watched together.
 
-First, run the development server:
+Live at [filmclub.space](https://filmclub.space)
 
+---
+
+## Screenshots
+
+<p float="left">
+  <img src="screenshots/login.jpg" width="180" />
+  <img src="screenshots/register.jpg" width="180" />
+  <img src="screenshots/voting.jpg" width="180" />
+  <img src="screenshots/winner.jpg" width="180" />
+  <img src="screenshots/admin.jpg" width="180" />
+</p>
+
+---
+
+## Tech Stack
+
+- **Framework** — Next.js 15 (App Router) with TypeScript
+- **Database** — PostgreSQL via Drizzle ORM
+- **Authentication** — NextAuth.js v4 (Credentials provider)
+- **Email** — Resend
+- **Styling** — Tailwind CSS with a neo-brutalism design system
+- **Deployment** — Hetzner VPS, Nginx reverse proxy, PM2, Let's Encrypt SSL
+
+---
+
+## Features
+
+**For members:**
+- Invite-only registration via single-use token links
+- Email and password authentication
+- Vote on five films each round with a confirmation dialog
+- Change your vote any time while voting is open
+- RSVP to the screening after the winner is announced
+- Automatic email notifications for every phase change
+
+**For the admin:**
+- Full round lifecycle management — voting → closed → winner
+- Pick winner automatically (random tiebreak on draws)
+- Set meeting date and place
+- Generate single-use invite links
+- View current round info and live vote counts
+- View all registered members
+- Create new rounds directly from the panel
+
+---
+
+## Running Locally
+
+**Prerequisites:** Node.js 20+, PostgreSQL
+
+**1. Clone the repo**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/xenkou90/film-club.git
+cd film-club
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**2. Install dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**3. Set up environment variables**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file in the root:
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/filmclub
+CURRENT_ROUND_ID=your-round-id
+ADMIN_KEY=your_admin_key
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxx
+```
 
-## Learn More
+Generate a `NEXTAUTH_SECRET` with:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-To learn more about Next.js, take a look at the following resources:
+**4. Run database migrations**
+```bash
+npx drizzle-kit migrate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**5. Seed the settings table**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Connect to your database and run:
+```sql
+INSERT INTO settings (key, value) VALUES ('currentRoundId', 'your-round-id');
+```
 
-## Deploy on Vercel
+**6. Start the dev server**
+```bash
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000](http://localhost:3000).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Deployment
+
+The app is deployed on a Hetzner CX23 VPS running Ubuntu 24, with:
+- **Nginx** as a reverse proxy
+- **PM2** to keep the Next.js process running
+- **Let's Encrypt** for SSL via Certbot
+
+After pulling changes on the server:
+```bash
+npm run build
+pm2 restart film-club
+```
+
+Run migrations if the schema changed:
+```bash
+npx drizzle-kit migrate
+```
+
+---
+
+## Author
+
+Imagined, Created, Designed by Xeno
