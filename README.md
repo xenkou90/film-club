@@ -9,11 +9,9 @@ Live at [filmclub.space](https://filmclub.space)
 ## Screenshots
 
 <p float="left">
-  <img src="screenshots/login.jpg" width="180" />
-  <img src="screenshots/register.jpg" width="180" />
-  <img src="screenshots/voting.jpg" width="180" />
-  <img src="screenshots/winner.jpg" width="180" />
-  <img src="screenshots/admin.jpg" width="180" />
+  <img src="screenshots/login-register.png" />
+  <img src="screenshots/voting-winner.png" />
+  <img src="screenshots/admin-panel.png" />
 </p>
 
 ---
